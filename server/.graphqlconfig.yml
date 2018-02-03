@@ -1,0 +1,15 @@
+projects:
+  app:
+    schemaPath: "src/schema.graphql"
+    extensions:
+      endpoints:
+        dev: "http://localhost:4000"
+      prepare-bundle: src/generated/app.graphql
+  database:
+    schemaPath: "src/generated/prisma.graphql"
+    extensions:
+      prisma: database/prisma.yml
+      prepare-binding:
+        output: src/generated/prisma.ts
+        generator: prisma-ts
+
