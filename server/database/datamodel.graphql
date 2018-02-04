@@ -1,4 +1,4 @@
-type Post {
+type Paragraph {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -13,5 +13,5 @@ type User {
   email: String! @unique
   password: String!
   name: String!
-  posts: [Post!]!
+  paragraphs: [Paragraph!]!
 }

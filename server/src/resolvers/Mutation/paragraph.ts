@@ -1,9 +1,9 @@
 import { getUserId, Context } from '../../utils';
 
-export const post = {
-  async createDraft(parent, { title, text }, ctx: Context, info) {
+export const paragraph = {
+  async createParagraph(parent, { title, text }, ctx: Context, info) {
     const userId = getUserId(ctx);
-    return ctx.db.mutation.createPost(
+    return ctx.db.mutation.createParagraph(
       {
         data: {
           title,
@@ -20,15 +20,15 @@ export const post = {
 
   async publish(parent, { id }, ctx: Context, info) {
     const userId = getUserId(ctx);
-    const postExists = await ctx.db.exists.Post({
+    const paragraphExists = await ctx.db.exists.Paragraph({
       id,
       author: { id: userId },
     });
-    if (!postExists) {
-      throw new Error(`Post not found or you're not the author`);
+    if (!paragraphExists) {
+      throw new Error(`Paragraph not found or you're not the author`);
     }
 
-    return ctx.db.mutation.updatePost(
+    return ctx.db.mutation.updateParagraph(
       {
         where: { id },
         data: { isPublished: true },
@@ -37,16 +37,16 @@ export const post = {
     );
   },
 
-  async deletePost(parent, { id }, ctx: Context, info) {
+  async deleteParagraph(parent, { id }, ctx: Context, info) {
     const userId = getUserId(ctx);
-    const postExists = await ctx.db.exists.Post({
+    const paragraphExists = await ctx.db.exists.Paragraph({
       id,
       author: { id: userId },
     });
-    if (!postExists) {
-      throw new Error(`Post not found or you're not the author`);
+    if (!paragraphExists) {
+      throw new Error(`Paragraph not found or you're not the author`);
     }
 
-    return ctx.db.mutation.deletePost({ where: { id } });
+    return ctx.db.mutation.deleteParagraph({ where: { id } });
   },
 };

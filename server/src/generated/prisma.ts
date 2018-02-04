@@ -9,7 +9,7 @@ const typeDefs = `
 # Model Types
 #
 
-type Post implements Node {
+type Paragraph implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -24,7 +24,7 @@ type User implements Node {
   email: String!
   password: String!
   name: String!
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  paragraphs(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Paragraph!]
 }
 
 
@@ -32,7 +32,7 @@ type User implements Node {
 # Other Types
 #
 
-type AggregatePost {
+type AggregateParagraph {
   count: Int!
 }
 
@@ -49,17 +49,17 @@ scalar DateTime
 scalar Long
 
 type Mutation {
-  createPost(data: PostCreateInput!): Post!
+  createParagraph(data: ParagraphCreateInput!): Paragraph!
   createUser(data: UserCreateInput!): User!
-  updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
+  updateParagraph(data: ParagraphUpdateInput!, where: ParagraphWhereUniqueInput!): Paragraph
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
-  deletePost(where: PostWhereUniqueInput!): Post
+  deleteParagraph(where: ParagraphWhereUniqueInput!): Paragraph
   deleteUser(where: UserWhereUniqueInput!): User
-  upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
+  upsertParagraph(where: ParagraphWhereUniqueInput!, create: ParagraphCreateInput!, update: ParagraphUpdateInput!): Paragraph!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
-  updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
+  updateManyParagraphs(data: ParagraphUpdateInput!, where: ParagraphWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
-  deleteManyPosts(where: PostWhereInput!): BatchPayload!
+  deleteManyParagraphs(where: ParagraphWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
 }
 
@@ -80,36 +80,36 @@ type PageInfo {
   endCursor: String
 }
 
-type PostConnection {
+type ParagraphConnection {
   pageInfo: PageInfo!
-  edges: [PostEdge]!
-  aggregate: AggregatePost!
+  edges: [ParagraphEdge]!
+  aggregate: AggregateParagraph!
 }
 
-input PostCreateInput {
+input ParagraphCreateInput {
   isPublished: Boolean
   title: String!
   text: String!
-  author: UserCreateOneWithoutPostsInput!
+  author: UserCreateOneWithoutParagraphsInput!
 }
 
-input PostCreateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
+input ParagraphCreateManyWithoutAuthorInput {
+  create: [ParagraphCreateWithoutAuthorInput!]
+  connect: [ParagraphWhereUniqueInput!]
 }
 
-input PostCreateWithoutAuthorInput {
+input ParagraphCreateWithoutAuthorInput {
   isPublished: Boolean
   title: String!
   text: String!
 }
 
-type PostEdge {
-  node: Post!
+type ParagraphEdge {
+  node: Paragraph!
   cursor: String!
 }
 
-enum PostOrderByInput {
+enum ParagraphOrderByInput {
   id_ASC
   id_DESC
   createdAt_ASC
@@ -124,7 +124,7 @@ enum PostOrderByInput {
   text_DESC
 }
 
-type PostPreviousValues {
+type ParagraphPreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -133,59 +133,59 @@ type PostPreviousValues {
   text: String!
 }
 
-type PostSubscriptionPayload {
+type ParagraphSubscriptionPayload {
   mutation: MutationType!
-  node: Post
+  node: Paragraph
   updatedFields: [String!]
-  previousValues: PostPreviousValues
+  previousValues: ParagraphPreviousValues
 }
 
-input PostSubscriptionWhereInput {
-  AND: [PostSubscriptionWhereInput!]
-  OR: [PostSubscriptionWhereInput!]
+input ParagraphSubscriptionWhereInput {
+  AND: [ParagraphSubscriptionWhereInput!]
+  OR: [ParagraphSubscriptionWhereInput!]
   mutation_in: [MutationType!]
   updatedFields_contains: String
   updatedFields_contains_every: [String!]
   updatedFields_contains_some: [String!]
-  node: PostWhereInput
+  node: ParagraphWhereInput
 }
 
-input PostUpdateInput {
+input ParagraphUpdateInput {
   isPublished: Boolean
   title: String
   text: String
-  author: UserUpdateOneWithoutPostsInput
+  author: UserUpdateOneWithoutParagraphsInput
 }
 
-input PostUpdateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
-  disconnect: [PostWhereUniqueInput!]
-  delete: [PostWhereUniqueInput!]
-  update: [PostUpdateWithoutAuthorInput!]
-  upsert: [PostUpsertWithoutAuthorInput!]
+input ParagraphUpdateManyWithoutAuthorInput {
+  create: [ParagraphCreateWithoutAuthorInput!]
+  connect: [ParagraphWhereUniqueInput!]
+  disconnect: [ParagraphWhereUniqueInput!]
+  delete: [ParagraphWhereUniqueInput!]
+  update: [ParagraphUpdateWithoutAuthorInput!]
+  upsert: [ParagraphUpsertWithoutAuthorInput!]
 }
 
-input PostUpdateWithoutAuthorDataInput {
+input ParagraphUpdateWithoutAuthorDataInput {
   isPublished: Boolean
   title: String
   text: String
 }
 
-input PostUpdateWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  data: PostUpdateWithoutAuthorDataInput!
+input ParagraphUpdateWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput!
+  data: ParagraphUpdateWithoutAuthorDataInput!
 }
 
-input PostUpsertWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  update: PostUpdateWithoutAuthorDataInput!
-  create: PostCreateWithoutAuthorInput!
+input ParagraphUpsertWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput!
+  update: ParagraphUpdateWithoutAuthorDataInput!
+  create: ParagraphCreateWithoutAuthorInput!
 }
 
-input PostWhereInput {
-  AND: [PostWhereInput!]
-  OR: [PostWhereInput!]
+input ParagraphWhereInput {
+  AND: [ParagraphWhereInput!]
+  OR: [ParagraphWhereInput!]
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -249,22 +249,22 @@ input PostWhereInput {
   author: UserWhereInput
 }
 
-input PostWhereUniqueInput {
+input ParagraphWhereUniqueInput {
   id: ID
 }
 
 type Query {
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
+  paragraphs(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Paragraph]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
-  post(where: PostWhereUniqueInput!): Post
+  paragraph(where: ParagraphWhereUniqueInput!): Paragraph
   user(where: UserWhereUniqueInput!): User
-  postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
+  paragraphsConnection(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ParagraphConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
 }
 
 type Subscription {
-  post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
+  paragraph(where: ParagraphSubscriptionWhereInput): ParagraphSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
@@ -278,15 +278,15 @@ input UserCreateInput {
   email: String!
   password: String!
   name: String!
-  posts: PostCreateManyWithoutAuthorInput
+  paragraphs: ParagraphCreateManyWithoutAuthorInput
 }
 
-input UserCreateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
+input UserCreateOneWithoutParagraphsInput {
+  create: UserCreateWithoutParagraphsInput
   connect: UserWhereUniqueInput
 }
 
-input UserCreateWithoutPostsInput {
+input UserCreateWithoutParagraphsInput {
   email: String!
   password: String!
   name: String!
@@ -340,33 +340,33 @@ input UserUpdateInput {
   email: String
   password: String
   name: String
-  posts: PostUpdateManyWithoutAuthorInput
+  paragraphs: ParagraphUpdateManyWithoutAuthorInput
 }
 
-input UserUpdateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
+input UserUpdateOneWithoutParagraphsInput {
+  create: UserCreateWithoutParagraphsInput
   connect: UserWhereUniqueInput
   disconnect: UserWhereUniqueInput
   delete: UserWhereUniqueInput
-  update: UserUpdateWithoutPostsInput
-  upsert: UserUpsertWithoutPostsInput
+  update: UserUpdateWithoutParagraphsInput
+  upsert: UserUpsertWithoutParagraphsInput
 }
 
-input UserUpdateWithoutPostsDataInput {
+input UserUpdateWithoutParagraphsDataInput {
   email: String
   password: String
   name: String
 }
 
-input UserUpdateWithoutPostsInput {
+input UserUpdateWithoutParagraphsInput {
   where: UserWhereUniqueInput!
-  data: UserUpdateWithoutPostsDataInput!
+  data: UserUpdateWithoutParagraphsDataInput!
 }
 
-input UserUpsertWithoutPostsInput {
+input UserUpsertWithoutParagraphsInput {
   where: UserWhereUniqueInput!
-  update: UserUpdateWithoutPostsDataInput!
-  create: UserCreateWithoutPostsInput!
+  update: UserUpdateWithoutParagraphsDataInput!
+  create: UserCreateWithoutParagraphsInput!
 }
 
 input UserWhereInput {
@@ -428,9 +428,9 @@ input UserWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
-  posts_every: PostWhereInput
-  posts_some: PostWhereInput
-  posts_none: PostWhereInput
+  paragraphs_every: ParagraphWhereInput
+  paragraphs_some: ParagraphWhereInput
+  paragraphs_none: ParagraphWhereInput
 }
 
 input UserWhereUniqueInput {
@@ -439,7 +439,7 @@ input UserWhereUniqueInput {
 }
 `
 
-export type PostOrderByInput = 
+export type ParagraphOrderByInput = 
   'id_ASC' |
   'id_DESC' |
   'createdAt_ASC' |
@@ -472,15 +472,15 @@ export type MutationType =
   'UPDATED' |
   'DELETED'
 
-export interface UserCreateWithoutPostsInput {
+export interface UserCreateWithoutParagraphsInput {
   email: String
   password: String
   name: String
 }
 
-export interface PostWhereInput {
-  AND?: PostWhereInput[] | PostWhereInput
-  OR?: PostWhereInput[] | PostWhereInput
+export interface ParagraphWhereInput {
+  AND?: ParagraphWhereInput[] | ParagraphWhereInput
+  OR?: ParagraphWhereInput[] | ParagraphWhereInput
   id?: ID_Input
   id_not?: ID_Input
   id_in?: ID_Input[] | ID_Input
@@ -544,9 +544,9 @@ export interface PostWhereInput {
   author?: UserWhereInput
 }
 
-export interface PostCreateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+export interface ParagraphCreateManyWithoutAuthorInput {
+  create?: ParagraphCreateWithoutAuthorInput[] | ParagraphCreateWithoutAuthorInput
+  connect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
 }
 
 export interface UserWhereInput {
@@ -608,44 +608,44 @@ export interface UserWhereInput {
   name_not_starts_with?: String
   name_ends_with?: String
   name_not_ends_with?: String
-  posts_every?: PostWhereInput
-  posts_some?: PostWhereInput
-  posts_none?: PostWhereInput
+  paragraphs_every?: ParagraphWhereInput
+  paragraphs_some?: ParagraphWhereInput
+  paragraphs_none?: ParagraphWhereInput
 }
 
-export interface PostUpdateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  disconnect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  delete?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  update?: PostUpdateWithoutAuthorInput[] | PostUpdateWithoutAuthorInput
-  upsert?: PostUpsertWithoutAuthorInput[] | PostUpsertWithoutAuthorInput
+export interface ParagraphUpdateManyWithoutAuthorInput {
+  create?: ParagraphCreateWithoutAuthorInput[] | ParagraphCreateWithoutAuthorInput
+  connect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
+  disconnect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
+  delete?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
+  update?: ParagraphUpdateWithoutAuthorInput[] | ParagraphUpdateWithoutAuthorInput
+  upsert?: ParagraphUpsertWithoutAuthorInput[] | ParagraphUpsertWithoutAuthorInput
 }
 
-export interface PostUpdateInput {
+export interface ParagraphUpdateInput {
   isPublished?: Boolean
   title?: String
   text?: String
-  author?: UserUpdateOneWithoutPostsInput
+  author?: UserUpdateOneWithoutParagraphsInput
 }
 
 export interface UserUpdateInput {
   email?: String
   password?: String
   name?: String
-  posts?: PostUpdateManyWithoutAuthorInput
+  paragraphs?: ParagraphUpdateManyWithoutAuthorInput
 }
 
-export interface PostCreateWithoutAuthorInput {
+export interface ParagraphCreateWithoutAuthorInput {
   isPublished?: Boolean
   title: String
   text: String
 }
 
-export interface UserUpsertWithoutPostsInput {
+export interface UserUpsertWithoutParagraphsInput {
   where: UserWhereUniqueInput
-  update: UserUpdateWithoutPostsDataInput
-  create: UserCreateWithoutPostsInput
+  update: UserUpdateWithoutParagraphsDataInput
+  create: UserCreateWithoutParagraphsInput
 }
 
 export interface UserSubscriptionWhereInput {
@@ -658,61 +658,61 @@ export interface UserSubscriptionWhereInput {
   node?: UserWhereInput
 }
 
-export interface UserUpdateWithoutPostsDataInput {
+export interface UserUpdateWithoutParagraphsDataInput {
   email?: String
   password?: String
   name?: String
 }
 
-export interface PostWhereUniqueInput {
+export interface ParagraphWhereUniqueInput {
   id?: ID_Input
 }
 
-export interface PostCreateInput {
+export interface ParagraphCreateInput {
   isPublished?: Boolean
   title: String
   text: String
-  author: UserCreateOneWithoutPostsInput
+  author: UserCreateOneWithoutParagraphsInput
 }
 
-export interface PostUpsertWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  update: PostUpdateWithoutAuthorDataInput
-  create: PostCreateWithoutAuthorInput
+export interface ParagraphUpsertWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput
+  update: ParagraphUpdateWithoutAuthorDataInput
+  create: ParagraphCreateWithoutAuthorInput
 }
 
-export interface PostUpdateWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  data: PostUpdateWithoutAuthorDataInput
+export interface ParagraphUpdateWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput
+  data: ParagraphUpdateWithoutAuthorDataInput
 }
 
-export interface UserUpdateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
+export interface UserUpdateOneWithoutParagraphsInput {
+  create?: UserCreateWithoutParagraphsInput
   connect?: UserWhereUniqueInput
   disconnect?: UserWhereUniqueInput
   delete?: UserWhereUniqueInput
-  update?: UserUpdateWithoutPostsInput
-  upsert?: UserUpsertWithoutPostsInput
+  update?: UserUpdateWithoutParagraphsInput
+  upsert?: UserUpsertWithoutParagraphsInput
 }
 
 export interface UserCreateInput {
   email: String
   password: String
   name: String
-  posts?: PostCreateManyWithoutAuthorInput
+  paragraphs?: ParagraphCreateManyWithoutAuthorInput
 }
 
-export interface UserUpdateWithoutPostsInput {
+export interface UserUpdateWithoutParagraphsInput {
   where: UserWhereUniqueInput
-  data: UserUpdateWithoutPostsDataInput
+  data: UserUpdateWithoutParagraphsDataInput
 }
 
-export interface UserCreateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
+export interface UserCreateOneWithoutParagraphsInput {
+  create?: UserCreateWithoutParagraphsInput
   connect?: UserWhereUniqueInput
 }
 
-export interface PostUpdateWithoutAuthorDataInput {
+export interface ParagraphUpdateWithoutAuthorDataInput {
   isPublished?: Boolean
   title?: String
   text?: String
@@ -723,14 +723,14 @@ export interface UserWhereUniqueInput {
   email?: String
 }
 
-export interface PostSubscriptionWhereInput {
-  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
-  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
+export interface ParagraphSubscriptionWhereInput {
+  AND?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
+  OR?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
   mutation_in?: MutationType[] | MutationType
   updatedFields_contains?: String
   updatedFields_contains_every?: String[] | String
   updatedFields_contains_some?: String[] | String
-  node?: PostWhereInput
+  node?: ParagraphWhereInput
 }
 
 export interface Node {
@@ -744,13 +744,13 @@ export interface UserPreviousValues {
   name: String
 }
 
-export interface PostConnection {
+export interface ParagraphConnection {
   pageInfo: PageInfo
-  edges: PostEdge[]
-  aggregate: AggregatePost
+  edges: ParagraphEdge[]
+  aggregate: AggregateParagraph
 }
 
-export interface Post extends Node {
+export interface Paragraph extends Node {
   id: ID_Output
   createdAt: DateTime
   updatedAt: DateTime
@@ -767,18 +767,18 @@ export interface PageInfo {
   endCursor?: String
 }
 
-export interface PostSubscriptionPayload {
+export interface ParagraphSubscriptionPayload {
   mutation: MutationType
-  node?: Post
+  node?: Paragraph
   updatedFields?: String[]
-  previousValues?: PostPreviousValues
+  previousValues?: ParagraphPreviousValues
 }
 
 export interface BatchPayload {
   count: Long
 }
 
-export interface PostPreviousValues {
+export interface ParagraphPreviousValues {
   id: ID_Output
   createdAt: DateTime
   updatedAt: DateTime
@@ -792,7 +792,7 @@ export interface User extends Node {
   email: String
   password: String
   name: String
-  posts?: Post[]
+  paragraphs?: Paragraph[]
 }
 
 export interface AggregateUser {
@@ -811,12 +811,12 @@ export interface UserEdge {
   cursor: String
 }
 
-export interface PostEdge {
-  node: Post
+export interface ParagraphEdge {
+  node: Paragraph
   cursor: String
 }
 
-export interface AggregatePost {
+export interface AggregateParagraph {
   count: Int
 }
 
@@ -858,32 +858,32 @@ export interface Schema {
 }
 
 export type Query = {
-  posts: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Post[]>
+  paragraphs: (args: { where?: ParagraphWhereInput, orderBy?: ParagraphOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Paragraph[]>
   users: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<User[]>
-  post: (args: { where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
+  paragraph: (args: { where: ParagraphWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph | null>
   user: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
-  postsConnection: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<PostConnection>
+  paragraphsConnection: (args: { where?: ParagraphWhereInput, orderBy?: ParagraphOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<ParagraphConnection>
   usersConnection: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<UserConnection>
   node: (args: { id: ID_Output }, info?: GraphQLResolveInfo | string) => Promise<Node | null>
 }
 
 export type Mutation = {
-  createPost: (args: { data: PostCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
+  createParagraph: (args: { data: ParagraphCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph>
   createUser: (args: { data: UserCreateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
-  updatePost: (args: { data: PostUpdateInput, where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
+  updateParagraph: (args: { data: ParagraphUpdateInput, where: ParagraphWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph | null>
   updateUser: (args: { data: UserUpdateInput, where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
-  deletePost: (args: { where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
+  deleteParagraph: (args: { where: ParagraphWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph | null>
   deleteUser: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
-  upsertPost: (args: { where: PostWhereUniqueInput, create: PostCreateInput, update: PostUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
+  upsertParagraph: (args: { where: ParagraphWhereUniqueInput, create: ParagraphCreateInput, update: ParagraphUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph>
   upsertUser: (args: { where: UserWhereUniqueInput, create: UserCreateInput, update: UserUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
-  updateManyPosts: (args: { data: PostUpdateInput, where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  updateManyParagraphs: (args: { data: ParagraphUpdateInput, where: ParagraphWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyUsers: (args: { data: UserUpdateInput, where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
-  deleteManyPosts: (args: { where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  deleteManyParagraphs: (args: { where: ParagraphWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyUsers: (args: { where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
 }
 
 export type Subscription = {
-  post: (args: { where?: PostSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<PostSubscriptionPayload>>
+  paragraph: (args: { where?: ParagraphSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<ParagraphSubscriptionPayload>>
   user: (args: { where?: UserSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<UserSubscriptionPayload>>
 }
 
@@ -894,37 +894,37 @@ export class Prisma extends BasePrisma {
   }
 
   exists = {
-    Post: (where: PostWhereInput): Promise<boolean> => super.existsDelegate('query', 'posts', { where }, {}, '{ id }'),
+    Paragraph: (where: ParagraphWhereInput): Promise<boolean> => super.existsDelegate('query', 'paragraphs', { where }, {}, '{ id }'),
     User: (where: UserWhereInput): Promise<boolean> => super.existsDelegate('query', 'users', { where }, {}, '{ id }')
   }
 
   query: Query = {
-    posts: (args, info): Promise<Post[]> => super.delegate('query', 'posts', args, {}, info),
+    paragraphs: (args, info): Promise<Paragraph[]> => super.delegate('query', 'paragraphs', args, {}, info),
     users: (args, info): Promise<User[]> => super.delegate('query', 'users', args, {}, info),
-    post: (args, info): Promise<Post | null> => super.delegate('query', 'post', args, {}, info),
+    paragraph: (args, info): Promise<Paragraph | null> => super.delegate('query', 'paragraph', args, {}, info),
     user: (args, info): Promise<User | null> => super.delegate('query', 'user', args, {}, info),
-    postsConnection: (args, info): Promise<PostConnection> => super.delegate('query', 'postsConnection', args, {}, info),
+    paragraphsConnection: (args, info): Promise<ParagraphConnection> => super.delegate('query', 'paragraphsConnection', args, {}, info),
     usersConnection: (args, info): Promise<UserConnection> => super.delegate('query', 'usersConnection', args, {}, info),
     node: (args, info): Promise<Node | null> => super.delegate('query', 'node', args, {}, info)
   }
 
   mutation: Mutation = {
-    createPost: (args, info): Promise<Post> => super.delegate('mutation', 'createPost', args, {}, info),
+    createParagraph: (args, info): Promise<Paragraph> => super.delegate('mutation', 'createParagraph', args, {}, info),
     createUser: (args, info): Promise<User> => super.delegate('mutation', 'createUser', args, {}, info),
-    updatePost: (args, info): Promise<Post | null> => super.delegate('mutation', 'updatePost', args, {}, info),
+    updateParagraph: (args, info): Promise<Paragraph | null> => super.delegate('mutation', 'updateParagraph', args, {}, info),
     updateUser: (args, info): Promise<User | null> => super.delegate('mutation', 'updateUser', args, {}, info),
-    deletePost: (args, info): Promise<Post | null> => super.delegate('mutation', 'deletePost', args, {}, info),
+    deleteParagraph: (args, info): Promise<Paragraph | null> => super.delegate('mutation', 'deleteParagraph', args, {}, info),
     deleteUser: (args, info): Promise<User | null> => super.delegate('mutation', 'deleteUser', args, {}, info),
-    upsertPost: (args, info): Promise<Post> => super.delegate('mutation', 'upsertPost', args, {}, info),
+    upsertParagraph: (args, info): Promise<Paragraph> => super.delegate('mutation', 'upsertParagraph', args, {}, info),
     upsertUser: (args, info): Promise<User> => super.delegate('mutation', 'upsertUser', args, {}, info),
-    updateManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyPosts', args, {}, info),
+    updateManyParagraphs: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyParagraphs', args, {}, info),
     updateManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyUsers', args, {}, info),
-    deleteManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyPosts', args, {}, info),
+    deleteManyParagraphs: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyParagraphs', args, {}, info),
     deleteManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyUsers', args, {}, info)
   }
 
   subscription: Subscription = {
-    post: (args, infoOrQuery): Promise<AsyncIterator<PostSubscriptionPayload>> => super.delegateSubscription('post', args, {}, infoOrQuery),
+    paragraph: (args, infoOrQuery): Promise<AsyncIterator<ParagraphSubscriptionPayload>> => super.delegateSubscription('paragraph', args, {}, infoOrQuery),
     user: (args, infoOrQuery): Promise<AsyncIterator<UserSubscriptionPayload>> => super.delegateSubscription('user', args, {}, infoOrQuery)
   }
 }

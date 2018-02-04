@@ -7,25 +7,25 @@ type User {
   id: ID!
   email: String!
   name: String!
-  posts: [Post!]!
+  paragraphs: [Paragraph!]!
 }
 
 type Query {
-  feed: [Post!]!
-  drafts: [Post!]!
-  post(id: ID!): Post!
+  feed: [Paragraph!]!
+  drafts: [Paragraph!]!
+  paragraph(id: ID!): Paragraph!
   me: User
 }
 
 type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
-  createDraft(title: String!, text: String!): Post!
-  publish(id: ID!): Post!
-  deletePost(id: ID!): Post!
+  createParagraph(title: String!, text: String!): Paragraph!
+  publish(id: ID!): Paragraph!
+  deleteParagraph(id: ID!): Paragraph!
 }
 
-type Post implements Node {
+type Paragraph implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -100,14 +100,14 @@ input UserWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
-  posts_every: PostWhereInput
-  posts_some: PostWhereInput
-  posts_none: PostWhereInput
+  paragraphs_every: ParagraphWhereInput
+  paragraphs_some: ParagraphWhereInput
+  paragraphs_none: ParagraphWhereInput
 }
 
-input PostWhereInput {
-  AND: [PostWhereInput!]
-  OR: [PostWhereInput!]
+input ParagraphWhereInput {
+  AND: [ParagraphWhereInput!]
+  OR: [ParagraphWhereInput!]
   id: ID
   id_not: ID
   id_in: [ID!]

@@ -5,7 +5,7 @@
 # Model Types
 #
 
-type Post implements Node {
+type Paragraph implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -20,7 +20,7 @@ type User implements Node {
   email: String!
   password: String!
   name: String!
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  paragraphs(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Paragraph!]
 }
 
 
@@ -28,7 +28,7 @@ type User implements Node {
 # Other Types
 #
 
-type AggregatePost {
+type AggregateParagraph {
   count: Int!
 }
 
@@ -45,17 +45,17 @@ scalar DateTime
 scalar Long
 
 type Mutation {
-  createPost(data: PostCreateInput!): Post!
+  createParagraph(data: ParagraphCreateInput!): Paragraph!
   createUser(data: UserCreateInput!): User!
-  updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
+  updateParagraph(data: ParagraphUpdateInput!, where: ParagraphWhereUniqueInput!): Paragraph
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
-  deletePost(where: PostWhereUniqueInput!): Post
+  deleteParagraph(where: ParagraphWhereUniqueInput!): Paragraph
   deleteUser(where: UserWhereUniqueInput!): User
-  upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
+  upsertParagraph(where: ParagraphWhereUniqueInput!, create: ParagraphCreateInput!, update: ParagraphUpdateInput!): Paragraph!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
-  updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
+  updateManyParagraphs(data: ParagraphUpdateInput!, where: ParagraphWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
-  deleteManyPosts(where: PostWhereInput!): BatchPayload!
+  deleteManyParagraphs(where: ParagraphWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
 }
 
@@ -76,36 +76,36 @@ type PageInfo {
   endCursor: String
 }
 
-type PostConnection {
+type ParagraphConnection {
   pageInfo: PageInfo!
-  edges: [PostEdge]!
-  aggregate: AggregatePost!
+  edges: [ParagraphEdge]!
+  aggregate: AggregateParagraph!
 }
 
-input PostCreateInput {
+input ParagraphCreateInput {
   isPublished: Boolean
   title: String!
   text: String!
-  author: UserCreateOneWithoutPostsInput!
+  author: UserCreateOneWithoutParagraphsInput!
 }
 
-input PostCreateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
+input ParagraphCreateManyWithoutAuthorInput {
+  create: [ParagraphCreateWithoutAuthorInput!]
+  connect: [ParagraphWhereUniqueInput!]
 }
 
-input PostCreateWithoutAuthorInput {
+input ParagraphCreateWithoutAuthorInput {
   isPublished: Boolean
   title: String!
   text: String!
 }
 
-type PostEdge {
-  node: Post!
+type ParagraphEdge {
+  node: Paragraph!
   cursor: String!
 }
 
-enum PostOrderByInput {
+enum ParagraphOrderByInput {
   id_ASC
   id_DESC
   createdAt_ASC
@@ -120,7 +120,7 @@ enum PostOrderByInput {
   text_DESC
 }
 
-type PostPreviousValues {
+type ParagraphPreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -129,59 +129,59 @@ type PostPreviousValues {
   text: String!
 }
 
-type PostSubscriptionPayload {
+type ParagraphSubscriptionPayload {
   mutation: MutationType!
-  node: Post
+  node: Paragraph
   updatedFields: [String!]
-  previousValues: PostPreviousValues
+  previousValues: ParagraphPreviousValues
 }
 
-input PostSubscriptionWhereInput {
-  AND: [PostSubscriptionWhereInput!]
-  OR: [PostSubscriptionWhereInput!]
+input ParagraphSubscriptionWhereInput {
+  AND: [ParagraphSubscriptionWhereInput!]
+  OR: [ParagraphSubscriptionWhereInput!]
   mutation_in: [MutationType!]
   updatedFields_contains: String
   updatedFields_contains_every: [String!]
   updatedFields_contains_some: [String!]
-  node: PostWhereInput
+  node: ParagraphWhereInput
 }
 
-input PostUpdateInput {
+input ParagraphUpdateInput {
   isPublished: Boolean
   title: String
   text: String
-  author: UserUpdateOneWithoutPostsInput
+  author: UserUpdateOneWithoutParagraphsInput
 }
 
-input PostUpdateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
-  disconnect: [PostWhereUniqueInput!]
-  delete: [PostWhereUniqueInput!]
-  update: [PostUpdateWithoutAuthorInput!]
-  upsert: [PostUpsertWithoutAuthorInput!]
+input ParagraphUpdateManyWithoutAuthorInput {
+  create: [ParagraphCreateWithoutAuthorInput!]
+  connect: [ParagraphWhereUniqueInput!]
+  disconnect: [ParagraphWhereUniqueInput!]
+  delete: [ParagraphWhereUniqueInput!]
+  update: [ParagraphUpdateWithoutAuthorInput!]
+  upsert: [ParagraphUpsertWithoutAuthorInput!]
 }
 
-input PostUpdateWithoutAuthorDataInput {
+input ParagraphUpdateWithoutAuthorDataInput {
   isPublished: Boolean
   title: String
   text: String
 }
 
-input PostUpdateWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  data: PostUpdateWithoutAuthorDataInput!
+input ParagraphUpdateWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput!
+  data: ParagraphUpdateWithoutAuthorDataInput!
 }
 
-input PostUpsertWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  update: PostUpdateWithoutAuthorDataInput!
-  create: PostCreateWithoutAuthorInput!
+input ParagraphUpsertWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput!
+  update: ParagraphUpdateWithoutAuthorDataInput!
+  create: ParagraphCreateWithoutAuthorInput!
 }
 
-input PostWhereInput {
-  AND: [PostWhereInput!]
-  OR: [PostWhereInput!]
+input ParagraphWhereInput {
+  AND: [ParagraphWhereInput!]
+  OR: [ParagraphWhereInput!]
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -245,22 +245,22 @@ input PostWhereInput {
   author: UserWhereInput
 }
 
-input PostWhereUniqueInput {
+input ParagraphWhereUniqueInput {
   id: ID
 }
 
 type Query {
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
+  paragraphs(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Paragraph]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
-  post(where: PostWhereUniqueInput!): Post
+  paragraph(where: ParagraphWhereUniqueInput!): Paragraph
   user(where: UserWhereUniqueInput!): User
-  postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
+  paragraphsConnection(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ParagraphConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
 }
 
 type Subscription {
-  post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
+  paragraph(where: ParagraphSubscriptionWhereInput): ParagraphSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
@@ -274,15 +274,15 @@ input UserCreateInput {
   email: String!
   password: String!
   name: String!
-  posts: PostCreateManyWithoutAuthorInput
+  paragraphs: ParagraphCreateManyWithoutAuthorInput
 }
 
-input UserCreateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
+input UserCreateOneWithoutParagraphsInput {
+  create: UserCreateWithoutParagraphsInput
   connect: UserWhereUniqueInput
 }
 
-input UserCreateWithoutPostsInput {
+input UserCreateWithoutParagraphsInput {
   email: String!
   password: String!
   name: String!
@@ -336,33 +336,33 @@ input UserUpdateInput {
   email: String
   password: String
   name: String
-  posts: PostUpdateManyWithoutAuthorInput
+  paragraphs: ParagraphUpdateManyWithoutAuthorInput
 }
 
-input UserUpdateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
+input UserUpdateOneWithoutParagraphsInput {
+  create: UserCreateWithoutParagraphsInput
   connect: UserWhereUniqueInput
   disconnect: UserWhereUniqueInput
   delete: UserWhereUniqueInput
-  update: UserUpdateWithoutPostsInput
-  upsert: UserUpsertWithoutPostsInput
+  update: UserUpdateWithoutParagraphsInput
+  upsert: UserUpsertWithoutParagraphsInput
 }
 
-input UserUpdateWithoutPostsDataInput {
+input UserUpdateWithoutParagraphsDataInput {
   email: String
   password: String
   name: String
 }
 
-input UserUpdateWithoutPostsInput {
+input UserUpdateWithoutParagraphsInput {
   where: UserWhereUniqueInput!
-  data: UserUpdateWithoutPostsDataInput!
+  data: UserUpdateWithoutParagraphsDataInput!
 }
 
-input UserUpsertWithoutPostsInput {
+input UserUpsertWithoutParagraphsInput {
   where: UserWhereUniqueInput!
-  update: UserUpdateWithoutPostsDataInput!
-  create: UserCreateWithoutPostsInput!
+  update: UserUpdateWithoutParagraphsDataInput!
+  create: UserCreateWithoutParagraphsInput!
 }
 
 input UserWhereInput {
@@ -424,9 +424,9 @@ input UserWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
-  posts_every: PostWhereInput
-  posts_some: PostWhereInput
-  posts_none: PostWhereInput
+  paragraphs_every: ParagraphWhereInput
+  paragraphs_some: ParagraphWhereInput
+  paragraphs_none: ParagraphWhereInput
 }
 
 input UserWhereUniqueInput {

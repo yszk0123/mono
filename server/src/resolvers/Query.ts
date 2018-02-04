@@ -2,7 +2,7 @@ import { getUserId, Context } from '../utils';
 
 export const Query = {
   feed(parent, args, ctx: Context, info) {
-    return ctx.db.query.posts({ where: { isPublished: true } }, info);
+    return ctx.db.query.paragraphs({ where: { isPublished: true } }, info);
   },
 
   drafts(parent, args, ctx: Context, info) {
@@ -15,11 +15,11 @@ export const Query = {
       },
     };
 
-    return ctx.db.query.posts({ where }, info);
+    return ctx.db.query.paragraphs({ where }, info);
   },
 
-  post(parent, { id }, ctx: Context, info) {
-    return ctx.db.query.post({ where: { id: id } }, info);
+  paragraph(parent, { id }, ctx: Context, info) {
+    return ctx.db.query.paragraph({ where: { id: id } }, info);
   },
 
   me(parent, args, ctx: Context, info) {

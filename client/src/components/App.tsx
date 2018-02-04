@@ -16,7 +16,10 @@ class App extends React.Component<DataProps<FeedQuery>> {
     return (
       <div>
         <h1>Hello</h1>
-        {feed && feed.map(post => <div key={post.id}>{post.title}</div>)}
+        {feed &&
+          feed.map(paragraph => (
+            <div key={paragraph.id}>{paragraph.title}</div>
+          ))}
       </div>
     );
   }

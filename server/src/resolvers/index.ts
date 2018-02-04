@@ -1,13 +1,13 @@
 import { Query } from './Query';
 import { auth } from './Mutation/auth';
-import { post } from './Mutation/post';
+import { paragraph } from './Mutation/paragraph';
 import { AuthPayload } from './AuthPayload';
 
 export default {
   Query,
   Mutation: {
     ...auth,
-    ...post,
+    ...paragraph,
   },
   AuthPayload,
 };
