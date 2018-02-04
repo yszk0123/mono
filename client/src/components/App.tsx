@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { graphql, DataProps } from 'react-apollo';
 import gql from 'graphql-tag';
-import { FeedQuery } from '../generated/schema';
+import { NotesQuery } from '../generated/schema';
 
 interface Props {}
 
-class App extends React.Component<DataProps<FeedQuery>> {
+class App extends React.Component<DataProps<NotesQuery>> {
   render() {
-    const { data: { loading, feed } } = this.props;
+    const { data: { loading, me } } = this.props;
 
     if (loading) {
       return <div>loading...</div>;
@@ -16,27 +16,31 @@ class App extends React.Component<DataProps<FeedQuery>> {
     return (
       <div>
         <h1>Hello</h1>
-        {feed &&
-          feed.map(paragraph => <div key={paragraph.id}>{paragraph.text}</div>)}
+        {me &&
+          me.notes &&
+          me.notes.map(note => <div key={note.id}>{note.text}</div>)}
       </div>
     );
   }
 }
 
-const FEED_QUERY = gql`
-  query Feed {
-    feed {
-      id
-      text
-      tags {
+const NOTES_QUERY = gql`
+  query Notes {
+    me {
+      notes {
         id
         text
+        tags {
+          id
+          text
+        }
+        createdAt
       }
     }
   }
 `;
 
-export default graphql<Props, FeedQuery>(FEED_QUERY, {
+export default graphql<Props, NotesQuery>(NOTES_QUERY, {
   options: {
     fetchPolicy: 'network-only',
   },

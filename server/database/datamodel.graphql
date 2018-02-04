@@ -1,27 +1,39 @@
-type Paragraph {
+type Note {
   id: ID! @unique
+  title: String
   text: String!
-  status: Status! @default(value: TEXT)
-  level: Int! @default(value: 0)
   tags: [Tag!]! @default(value: [])
-  story: Paragraph
-  author: User!
+  members: [Member!]! @default(value: [])
+  links: [Link!]! @default(value: [])
   createdAt: DateTime!
-}
-
-enum Status {
-  TEXT
-  ORDERED
-  UNORDERED
-  CHECKED
-  UNCHECKED
+  createdBy: User!
+  date: DateTime
 }
 
 type Tag {
   id: ID! @unique
   text: String!
   category: Tag
-  author: User!
+  createdBy: User!
+}
+
+type Member {
+  id: ID! @unique
+  name: String!
+  createdBy: User!
+}
+
+type Book {
+  id: ID! @unique
+  title: String!
+  author: String
+  createdBy: User!
+}
+
+type Link {
+  id: ID! @unique
+  uri: String! @unique
+  createdBy: User!
 }
 
 type User {
@@ -29,5 +41,9 @@ type User {
   email: String! @unique
   password: String!
   name: String!
-  paragraphs: [Paragraph!]!
+  notes: [Note!]!
+  tags: [Tag!]!
+  members: [Member!]!
+  links: [Link!]!
+  books: [Book!]!
 }

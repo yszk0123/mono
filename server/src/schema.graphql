@@ -1,18 +1,19 @@
-# import Paragraph from "./generated/prisma.graphql"
+# import Note from "./generated/prisma.graphql"
 
 type Query {
-  feed: [Paragraph!]!
-  drafts: [Paragraph!]!
-  paragraph(id: ID!): Paragraph!
   me: User
 }
 
 type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
-  createParagraph(title: String!, text: String!): Paragraph!
-  publish(id: ID!): Paragraph!
-  deleteParagraph(id: ID!): Paragraph!
+  createNote(text: String!): Note!
+  updateNote(id: ID!, text: String!): Note!
+  deleteNote(id: ID!): Note!
+  createTag(text: String!): Tag!
+  renameTag(id: ID!, text: String!): Tag!
+  moveTag(from: ID!, to: ID!): Tag!
+  deleteTag(id: ID!): Tag!
 }
 
 type AuthPayload {
@@ -24,5 +25,5 @@ type User {
   id: ID!
   email: String!
   name: String!
-  paragraphs: [Paragraph!]!
+  notes: [Note!]!
 }

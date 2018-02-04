@@ -9,22 +9,42 @@ const typeDefs = `
 # Model Types
 #
 
-type Paragraph implements Node {
+type Book implements Node {
   id: ID!
+  title: String!
+  author: String
+  createdBy(where: UserWhereInput): User!
+}
+
+type Link implements Node {
+  id: ID!
+  uri: String!
+  createdBy(where: UserWhereInput): User!
+}
+
+type Member implements Node {
+  id: ID!
+  name: String!
+  createdBy(where: UserWhereInput): User!
+}
+
+type Note implements Node {
+  id: ID!
+  title: String
   text: String!
-  status: Status!
-  level: Int!
   tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
-  story(where: ParagraphWhereInput): Paragraph
-  author(where: UserWhereInput): User!
+  members(where: MemberWhereInput, orderBy: MemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Member!]
+  links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link!]
   createdAt: DateTime!
+  createdBy(where: UserWhereInput): User!
+  date: DateTime
 }
 
 type Tag implements Node {
   id: ID!
   text: String!
   category(where: TagWhereInput): Tag
-  author(where: UserWhereInput): User!
+  createdBy(where: UserWhereInput): User!
 }
 
 type User implements Node {
@@ -32,7 +52,11 @@ type User implements Node {
   email: String!
   password: String!
   name: String!
-  paragraphs(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Paragraph!]
+  notes(where: NoteWhereInput, orderBy: NoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Note!]
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
+  members(where: MemberWhereInput, orderBy: MemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Member!]
+  links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link!]
+  books(where: BookWhereInput, orderBy: BookOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Book!]
 }
 
 
@@ -40,7 +64,19 @@ type User implements Node {
 # Other Types
 #
 
-type AggregateParagraph {
+type AggregateBook {
+  count: Int!
+}
+
+type AggregateLink {
+  count: Int!
+}
+
+type AggregateMember {
+  count: Int!
+}
+
+type AggregateNote {
   count: Int!
 }
 
@@ -56,202 +92,103 @@ type BatchPayload {
   count: Long!
 }
 
-scalar DateTime
-
-scalar Long
-
-type Mutation {
-  createParagraph(data: ParagraphCreateInput!): Paragraph!
-  createTag(data: TagCreateInput!): Tag!
-  createUser(data: UserCreateInput!): User!
-  updateParagraph(data: ParagraphUpdateInput!, where: ParagraphWhereUniqueInput!): Paragraph
-  updateTag(data: TagUpdateInput!, where: TagWhereUniqueInput!): Tag
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
-  deleteParagraph(where: ParagraphWhereUniqueInput!): Paragraph
-  deleteTag(where: TagWhereUniqueInput!): Tag
-  deleteUser(where: UserWhereUniqueInput!): User
-  upsertParagraph(where: ParagraphWhereUniqueInput!, create: ParagraphCreateInput!, update: ParagraphUpdateInput!): Paragraph!
-  upsertTag(where: TagWhereUniqueInput!, create: TagCreateInput!, update: TagUpdateInput!): Tag!
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
-  updateManyParagraphs(data: ParagraphUpdateInput!, where: ParagraphWhereInput!): BatchPayload!
-  updateManyTags(data: TagUpdateInput!, where: TagWhereInput!): BatchPayload!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
-  deleteManyParagraphs(where: ParagraphWhereInput!): BatchPayload!
-  deleteManyTags(where: TagWhereInput!): BatchPayload!
-  deleteManyUsers(where: UserWhereInput!): BatchPayload!
-}
-
-enum MutationType {
-  CREATED
-  UPDATED
-  DELETED
-}
-
-interface Node {
-  id: ID!
-}
-
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
-}
-
-type ParagraphConnection {
+type BookConnection {
   pageInfo: PageInfo!
-  edges: [ParagraphEdge]!
-  aggregate: AggregateParagraph!
+  edges: [BookEdge]!
+  aggregate: AggregateBook!
 }
 
-input ParagraphCreateInput {
-  text: String!
-  status: Status
-  level: Int
-  tags: TagCreateManyInput
-  story: ParagraphCreateOneWithoutStoryInput
-  author: UserCreateOneWithoutParagraphsInput!
+input BookCreateInput {
+  title: String!
+  author: String
+  createdBy: UserCreateOneWithoutBooksInput!
 }
 
-input ParagraphCreateManyWithoutAuthorInput {
-  create: [ParagraphCreateWithoutAuthorInput!]
-  connect: [ParagraphWhereUniqueInput!]
+input BookCreateManyWithoutCreatedByInput {
+  create: [BookCreateWithoutCreatedByInput!]
+  connect: [BookWhereUniqueInput!]
 }
 
-input ParagraphCreateOneWithoutStoryInput {
-  create: ParagraphCreateWithoutStoryInput
-  connect: ParagraphWhereUniqueInput
+input BookCreateWithoutCreatedByInput {
+  title: String!
+  author: String
 }
 
-input ParagraphCreateWithoutAuthorInput {
-  text: String!
-  status: Status
-  level: Int
-  tags: TagCreateManyInput
-  story: ParagraphCreateOneWithoutStoryInput
-}
-
-input ParagraphCreateWithoutStoryInput {
-  text: String!
-  status: Status
-  level: Int
-  tags: TagCreateManyInput
-  author: UserCreateOneWithoutParagraphsInput!
-}
-
-type ParagraphEdge {
-  node: Paragraph!
+type BookEdge {
+  node: Book!
   cursor: String!
 }
 
-enum ParagraphOrderByInput {
+enum BookOrderByInput {
   id_ASC
   id_DESC
-  text_ASC
-  text_DESC
-  status_ASC
-  status_DESC
-  level_ASC
-  level_DESC
-  createdAt_ASC
-  createdAt_DESC
+  title_ASC
+  title_DESC
+  author_ASC
+  author_DESC
   updatedAt_ASC
   updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
 }
 
-type ParagraphPreviousValues {
+type BookPreviousValues {
   id: ID!
-  text: String!
-  status: Status!
-  level: Int!
-  createdAt: DateTime!
+  title: String!
+  author: String
 }
 
-type ParagraphSubscriptionPayload {
+type BookSubscriptionPayload {
   mutation: MutationType!
-  node: Paragraph
+  node: Book
   updatedFields: [String!]
-  previousValues: ParagraphPreviousValues
+  previousValues: BookPreviousValues
 }
 
-input ParagraphSubscriptionWhereInput {
-  AND: [ParagraphSubscriptionWhereInput!]
-  OR: [ParagraphSubscriptionWhereInput!]
+input BookSubscriptionWhereInput {
+  AND: [BookSubscriptionWhereInput!]
+  OR: [BookSubscriptionWhereInput!]
   mutation_in: [MutationType!]
   updatedFields_contains: String
   updatedFields_contains_every: [String!]
   updatedFields_contains_some: [String!]
-  node: ParagraphWhereInput
+  node: BookWhereInput
 }
 
-input ParagraphUpdateInput {
-  text: String
-  status: Status
-  level: Int
-  tags: TagUpdateManyInput
-  story: ParagraphUpdateOneWithoutStoryInput
-  author: UserUpdateOneWithoutParagraphsInput
+input BookUpdateInput {
+  title: String
+  author: String
+  createdBy: UserUpdateOneWithoutBooksInput
 }
 
-input ParagraphUpdateManyWithoutAuthorInput {
-  create: [ParagraphCreateWithoutAuthorInput!]
-  connect: [ParagraphWhereUniqueInput!]
-  disconnect: [ParagraphWhereUniqueInput!]
-  delete: [ParagraphWhereUniqueInput!]
-  update: [ParagraphUpdateWithoutAuthorInput!]
-  upsert: [ParagraphUpsertWithoutAuthorInput!]
+input BookUpdateManyWithoutCreatedByInput {
+  create: [BookCreateWithoutCreatedByInput!]
+  connect: [BookWhereUniqueInput!]
+  disconnect: [BookWhereUniqueInput!]
+  delete: [BookWhereUniqueInput!]
+  update: [BookUpdateWithoutCreatedByInput!]
+  upsert: [BookUpsertWithoutCreatedByInput!]
 }
 
-input ParagraphUpdateOneWithoutStoryInput {
-  create: ParagraphCreateWithoutStoryInput
-  connect: ParagraphWhereUniqueInput
-  disconnect: ParagraphWhereUniqueInput
-  delete: ParagraphWhereUniqueInput
-  update: ParagraphUpdateWithoutStoryInput
-  upsert: ParagraphUpsertWithoutStoryInput
+input BookUpdateWithoutCreatedByDataInput {
+  title: String
+  author: String
 }
 
-input ParagraphUpdateWithoutAuthorDataInput {
-  text: String
-  status: Status
-  level: Int
-  tags: TagUpdateManyInput
-  story: ParagraphUpdateOneWithoutStoryInput
+input BookUpdateWithoutCreatedByInput {
+  where: BookWhereUniqueInput!
+  data: BookUpdateWithoutCreatedByDataInput!
 }
 
-input ParagraphUpdateWithoutAuthorInput {
-  where: ParagraphWhereUniqueInput!
-  data: ParagraphUpdateWithoutAuthorDataInput!
+input BookUpsertWithoutCreatedByInput {
+  where: BookWhereUniqueInput!
+  update: BookUpdateWithoutCreatedByDataInput!
+  create: BookCreateWithoutCreatedByInput!
 }
 
-input ParagraphUpdateWithoutStoryDataInput {
-  text: String
-  status: Status
-  level: Int
-  tags: TagUpdateManyInput
-  author: UserUpdateOneWithoutParagraphsInput
-}
-
-input ParagraphUpdateWithoutStoryInput {
-  where: ParagraphWhereUniqueInput!
-  data: ParagraphUpdateWithoutStoryDataInput!
-}
-
-input ParagraphUpsertWithoutAuthorInput {
-  where: ParagraphWhereUniqueInput!
-  update: ParagraphUpdateWithoutAuthorDataInput!
-  create: ParagraphCreateWithoutAuthorInput!
-}
-
-input ParagraphUpsertWithoutStoryInput {
-  where: ParagraphWhereUniqueInput!
-  update: ParagraphUpdateWithoutStoryDataInput!
-  create: ParagraphCreateWithoutStoryInput!
-}
-
-input ParagraphWhereInput {
-  AND: [ParagraphWhereInput!]
-  OR: [ParagraphWhereInput!]
+input BookWhereInput {
+  AND: [BookWhereInput!]
+  OR: [BookWhereInput!]
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -266,6 +203,514 @@ input ParagraphWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  author: String
+  author_not: String
+  author_in: [String!]
+  author_not_in: [String!]
+  author_lt: String
+  author_lte: String
+  author_gt: String
+  author_gte: String
+  author_contains: String
+  author_not_contains: String
+  author_starts_with: String
+  author_not_starts_with: String
+  author_ends_with: String
+  author_not_ends_with: String
+  createdBy: UserWhereInput
+}
+
+input BookWhereUniqueInput {
+  id: ID
+}
+
+scalar DateTime
+
+type LinkConnection {
+  pageInfo: PageInfo!
+  edges: [LinkEdge]!
+  aggregate: AggregateLink!
+}
+
+input LinkCreateInput {
+  uri: String!
+  createdBy: UserCreateOneWithoutLinksInput!
+}
+
+input LinkCreateManyInput {
+  create: [LinkCreateInput!]
+  connect: [LinkWhereUniqueInput!]
+}
+
+input LinkCreateManyWithoutCreatedByInput {
+  create: [LinkCreateWithoutCreatedByInput!]
+  connect: [LinkWhereUniqueInput!]
+}
+
+input LinkCreateWithoutCreatedByInput {
+  uri: String!
+}
+
+type LinkEdge {
+  node: Link!
+  cursor: String!
+}
+
+enum LinkOrderByInput {
+  id_ASC
+  id_DESC
+  uri_ASC
+  uri_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type LinkPreviousValues {
+  id: ID!
+  uri: String!
+}
+
+type LinkSubscriptionPayload {
+  mutation: MutationType!
+  node: Link
+  updatedFields: [String!]
+  previousValues: LinkPreviousValues
+}
+
+input LinkSubscriptionWhereInput {
+  AND: [LinkSubscriptionWhereInput!]
+  OR: [LinkSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: LinkWhereInput
+}
+
+input LinkUpdateInput {
+  uri: String
+  createdBy: UserUpdateOneWithoutLinksInput
+}
+
+input LinkUpdateManyInput {
+  create: [LinkCreateInput!]
+  connect: [LinkWhereUniqueInput!]
+  disconnect: [LinkWhereUniqueInput!]
+  delete: [LinkWhereUniqueInput!]
+}
+
+input LinkUpdateManyWithoutCreatedByInput {
+  create: [LinkCreateWithoutCreatedByInput!]
+  connect: [LinkWhereUniqueInput!]
+  disconnect: [LinkWhereUniqueInput!]
+  delete: [LinkWhereUniqueInput!]
+  update: [LinkUpdateWithoutCreatedByInput!]
+  upsert: [LinkUpsertWithoutCreatedByInput!]
+}
+
+input LinkUpdateWithoutCreatedByDataInput {
+  uri: String
+}
+
+input LinkUpdateWithoutCreatedByInput {
+  where: LinkWhereUniqueInput!
+  data: LinkUpdateWithoutCreatedByDataInput!
+}
+
+input LinkUpsertWithoutCreatedByInput {
+  where: LinkWhereUniqueInput!
+  update: LinkUpdateWithoutCreatedByDataInput!
+  create: LinkCreateWithoutCreatedByInput!
+}
+
+input LinkWhereInput {
+  AND: [LinkWhereInput!]
+  OR: [LinkWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  uri: String
+  uri_not: String
+  uri_in: [String!]
+  uri_not_in: [String!]
+  uri_lt: String
+  uri_lte: String
+  uri_gt: String
+  uri_gte: String
+  uri_contains: String
+  uri_not_contains: String
+  uri_starts_with: String
+  uri_not_starts_with: String
+  uri_ends_with: String
+  uri_not_ends_with: String
+  createdBy: UserWhereInput
+}
+
+input LinkWhereUniqueInput {
+  id: ID
+  uri: String
+}
+
+scalar Long
+
+type MemberConnection {
+  pageInfo: PageInfo!
+  edges: [MemberEdge]!
+  aggregate: AggregateMember!
+}
+
+input MemberCreateInput {
+  name: String!
+  createdBy: UserCreateOneWithoutMembersInput!
+}
+
+input MemberCreateManyInput {
+  create: [MemberCreateInput!]
+  connect: [MemberWhereUniqueInput!]
+}
+
+input MemberCreateManyWithoutCreatedByInput {
+  create: [MemberCreateWithoutCreatedByInput!]
+  connect: [MemberWhereUniqueInput!]
+}
+
+input MemberCreateWithoutCreatedByInput {
+  name: String!
+}
+
+type MemberEdge {
+  node: Member!
+  cursor: String!
+}
+
+enum MemberOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type MemberPreviousValues {
+  id: ID!
+  name: String!
+}
+
+type MemberSubscriptionPayload {
+  mutation: MutationType!
+  node: Member
+  updatedFields: [String!]
+  previousValues: MemberPreviousValues
+}
+
+input MemberSubscriptionWhereInput {
+  AND: [MemberSubscriptionWhereInput!]
+  OR: [MemberSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: MemberWhereInput
+}
+
+input MemberUpdateInput {
+  name: String
+  createdBy: UserUpdateOneWithoutMembersInput
+}
+
+input MemberUpdateManyInput {
+  create: [MemberCreateInput!]
+  connect: [MemberWhereUniqueInput!]
+  disconnect: [MemberWhereUniqueInput!]
+  delete: [MemberWhereUniqueInput!]
+}
+
+input MemberUpdateManyWithoutCreatedByInput {
+  create: [MemberCreateWithoutCreatedByInput!]
+  connect: [MemberWhereUniqueInput!]
+  disconnect: [MemberWhereUniqueInput!]
+  delete: [MemberWhereUniqueInput!]
+  update: [MemberUpdateWithoutCreatedByInput!]
+  upsert: [MemberUpsertWithoutCreatedByInput!]
+}
+
+input MemberUpdateWithoutCreatedByDataInput {
+  name: String
+}
+
+input MemberUpdateWithoutCreatedByInput {
+  where: MemberWhereUniqueInput!
+  data: MemberUpdateWithoutCreatedByDataInput!
+}
+
+input MemberUpsertWithoutCreatedByInput {
+  where: MemberWhereUniqueInput!
+  update: MemberUpdateWithoutCreatedByDataInput!
+  create: MemberCreateWithoutCreatedByInput!
+}
+
+input MemberWhereInput {
+  AND: [MemberWhereInput!]
+  OR: [MemberWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  createdBy: UserWhereInput
+}
+
+input MemberWhereUniqueInput {
+  id: ID
+}
+
+type Mutation {
+  createNote(data: NoteCreateInput!): Note!
+  createTag(data: TagCreateInput!): Tag!
+  createMember(data: MemberCreateInput!): Member!
+  createBook(data: BookCreateInput!): Book!
+  createLink(data: LinkCreateInput!): Link!
+  createUser(data: UserCreateInput!): User!
+  updateNote(data: NoteUpdateInput!, where: NoteWhereUniqueInput!): Note
+  updateTag(data: TagUpdateInput!, where: TagWhereUniqueInput!): Tag
+  updateMember(data: MemberUpdateInput!, where: MemberWhereUniqueInput!): Member
+  updateBook(data: BookUpdateInput!, where: BookWhereUniqueInput!): Book
+  updateLink(data: LinkUpdateInput!, where: LinkWhereUniqueInput!): Link
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  deleteNote(where: NoteWhereUniqueInput!): Note
+  deleteTag(where: TagWhereUniqueInput!): Tag
+  deleteMember(where: MemberWhereUniqueInput!): Member
+  deleteBook(where: BookWhereUniqueInput!): Book
+  deleteLink(where: LinkWhereUniqueInput!): Link
+  deleteUser(where: UserWhereUniqueInput!): User
+  upsertNote(where: NoteWhereUniqueInput!, create: NoteCreateInput!, update: NoteUpdateInput!): Note!
+  upsertTag(where: TagWhereUniqueInput!, create: TagCreateInput!, update: TagUpdateInput!): Tag!
+  upsertMember(where: MemberWhereUniqueInput!, create: MemberCreateInput!, update: MemberUpdateInput!): Member!
+  upsertBook(where: BookWhereUniqueInput!, create: BookCreateInput!, update: BookUpdateInput!): Book!
+  upsertLink(where: LinkWhereUniqueInput!, create: LinkCreateInput!, update: LinkUpdateInput!): Link!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  updateManyNotes(data: NoteUpdateInput!, where: NoteWhereInput!): BatchPayload!
+  updateManyTags(data: TagUpdateInput!, where: TagWhereInput!): BatchPayload!
+  updateManyMembers(data: MemberUpdateInput!, where: MemberWhereInput!): BatchPayload!
+  updateManyBooks(data: BookUpdateInput!, where: BookWhereInput!): BatchPayload!
+  updateManyLinks(data: LinkUpdateInput!, where: LinkWhereInput!): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
+  deleteManyNotes(where: NoteWhereInput!): BatchPayload!
+  deleteManyTags(where: TagWhereInput!): BatchPayload!
+  deleteManyMembers(where: MemberWhereInput!): BatchPayload!
+  deleteManyBooks(where: BookWhereInput!): BatchPayload!
+  deleteManyLinks(where: LinkWhereInput!): BatchPayload!
+  deleteManyUsers(where: UserWhereInput!): BatchPayload!
+}
+
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+interface Node {
+  id: ID!
+}
+
+type NoteConnection {
+  pageInfo: PageInfo!
+  edges: [NoteEdge]!
+  aggregate: AggregateNote!
+}
+
+input NoteCreateInput {
+  title: String
+  text: String!
+  date: DateTime
+  tags: TagCreateManyInput
+  members: MemberCreateManyInput
+  links: LinkCreateManyInput
+  createdBy: UserCreateOneWithoutNotesInput!
+}
+
+input NoteCreateManyWithoutCreatedByInput {
+  create: [NoteCreateWithoutCreatedByInput!]
+  connect: [NoteWhereUniqueInput!]
+}
+
+input NoteCreateWithoutCreatedByInput {
+  title: String
+  text: String!
+  date: DateTime
+  tags: TagCreateManyInput
+  members: MemberCreateManyInput
+  links: LinkCreateManyInput
+}
+
+type NoteEdge {
+  node: Note!
+  cursor: String!
+}
+
+enum NoteOrderByInput {
+  id_ASC
+  id_DESC
+  title_ASC
+  title_DESC
+  text_ASC
+  text_DESC
+  createdAt_ASC
+  createdAt_DESC
+  date_ASC
+  date_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type NotePreviousValues {
+  id: ID!
+  title: String
+  text: String!
+  createdAt: DateTime!
+  date: DateTime
+}
+
+type NoteSubscriptionPayload {
+  mutation: MutationType!
+  node: Note
+  updatedFields: [String!]
+  previousValues: NotePreviousValues
+}
+
+input NoteSubscriptionWhereInput {
+  AND: [NoteSubscriptionWhereInput!]
+  OR: [NoteSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: NoteWhereInput
+}
+
+input NoteUpdateInput {
+  title: String
+  text: String
+  date: DateTime
+  tags: TagUpdateManyInput
+  members: MemberUpdateManyInput
+  links: LinkUpdateManyInput
+  createdBy: UserUpdateOneWithoutNotesInput
+}
+
+input NoteUpdateManyWithoutCreatedByInput {
+  create: [NoteCreateWithoutCreatedByInput!]
+  connect: [NoteWhereUniqueInput!]
+  disconnect: [NoteWhereUniqueInput!]
+  delete: [NoteWhereUniqueInput!]
+  update: [NoteUpdateWithoutCreatedByInput!]
+  upsert: [NoteUpsertWithoutCreatedByInput!]
+}
+
+input NoteUpdateWithoutCreatedByDataInput {
+  title: String
+  text: String
+  date: DateTime
+  tags: TagUpdateManyInput
+  members: MemberUpdateManyInput
+  links: LinkUpdateManyInput
+}
+
+input NoteUpdateWithoutCreatedByInput {
+  where: NoteWhereUniqueInput!
+  data: NoteUpdateWithoutCreatedByDataInput!
+}
+
+input NoteUpsertWithoutCreatedByInput {
+  where: NoteWhereUniqueInput!
+  update: NoteUpdateWithoutCreatedByDataInput!
+  create: NoteCreateWithoutCreatedByInput!
+}
+
+input NoteWhereInput {
+  AND: [NoteWhereInput!]
+  OR: [NoteWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
   text: String
   text_not: String
   text_in: [String!]
@@ -280,18 +725,6 @@ input ParagraphWhereInput {
   text_not_starts_with: String
   text_ends_with: String
   text_not_ends_with: String
-  status: Status
-  status_not: Status
-  status_in: [Status!]
-  status_not_in: [Status!]
-  level: Int
-  level_not: Int
-  level_in: [Int!]
-  level_not_in: [Int!]
-  level_lt: Int
-  level_lte: Int
-  level_gt: Int
-  level_gte: Int
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -300,41 +733,65 @@ input ParagraphWhereInput {
   createdAt_lte: DateTime
   createdAt_gt: DateTime
   createdAt_gte: DateTime
+  date: DateTime
+  date_not: DateTime
+  date_in: [DateTime!]
+  date_not_in: [DateTime!]
+  date_lt: DateTime
+  date_lte: DateTime
+  date_gt: DateTime
+  date_gte: DateTime
   tags_every: TagWhereInput
   tags_some: TagWhereInput
   tags_none: TagWhereInput
-  story: ParagraphWhereInput
-  author: UserWhereInput
+  members_every: MemberWhereInput
+  members_some: MemberWhereInput
+  members_none: MemberWhereInput
+  links_every: LinkWhereInput
+  links_some: LinkWhereInput
+  links_none: LinkWhereInput
+  createdBy: UserWhereInput
 }
 
-input ParagraphWhereUniqueInput {
+input NoteWhereUniqueInput {
   id: ID
 }
 
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
 type Query {
-  paragraphs(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Paragraph]!
+  notes(where: NoteWhereInput, orderBy: NoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Note]!
   tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag]!
+  members(where: MemberWhereInput, orderBy: MemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Member]!
+  books(where: BookWhereInput, orderBy: BookOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Book]!
+  links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
-  paragraph(where: ParagraphWhereUniqueInput!): Paragraph
+  note(where: NoteWhereUniqueInput!): Note
   tag(where: TagWhereUniqueInput!): Tag
+  member(where: MemberWhereUniqueInput!): Member
+  book(where: BookWhereUniqueInput!): Book
+  link(where: LinkWhereUniqueInput!): Link
   user(where: UserWhereUniqueInput!): User
-  paragraphsConnection(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ParagraphConnection!
+  notesConnection(where: NoteWhereInput, orderBy: NoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NoteConnection!
   tagsConnection(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TagConnection!
+  membersConnection(where: MemberWhereInput, orderBy: MemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MemberConnection!
+  booksConnection(where: BookWhereInput, orderBy: BookOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): BookConnection!
+  linksConnection(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LinkConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
 }
 
-enum Status {
-  TEXT
-  ORDERED
-  UNORDERED
-  CHECKED
-  UNCHECKED
-}
-
 type Subscription {
-  paragraph(where: ParagraphSubscriptionWhereInput): ParagraphSubscriptionPayload
+  note(where: NoteSubscriptionWhereInput): NoteSubscriptionPayload
   tag(where: TagSubscriptionWhereInput): TagSubscriptionPayload
+  member(where: MemberSubscriptionWhereInput): MemberSubscriptionPayload
+  book(where: BookSubscriptionWhereInput): BookSubscriptionPayload
+  link(where: LinkSubscriptionWhereInput): LinkSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
@@ -347,11 +804,16 @@ type TagConnection {
 input TagCreateInput {
   text: String!
   category: TagCreateOneWithoutCategoryInput
-  author: UserCreateOneInput!
+  createdBy: UserCreateOneWithoutTagsInput!
 }
 
 input TagCreateManyInput {
   create: [TagCreateInput!]
+  connect: [TagWhereUniqueInput!]
+}
+
+input TagCreateManyWithoutCreatedByInput {
+  create: [TagCreateWithoutCreatedByInput!]
   connect: [TagWhereUniqueInput!]
 }
 
@@ -362,7 +824,12 @@ input TagCreateOneWithoutCategoryInput {
 
 input TagCreateWithoutCategoryInput {
   text: String!
-  author: UserCreateOneInput!
+  createdBy: UserCreateOneWithoutTagsInput!
+}
+
+input TagCreateWithoutCreatedByInput {
+  text: String!
+  category: TagCreateOneWithoutCategoryInput
 }
 
 type TagEdge {
@@ -406,7 +873,7 @@ input TagSubscriptionWhereInput {
 input TagUpdateInput {
   text: String
   category: TagUpdateOneWithoutCategoryInput
-  author: UserUpdateOneInput
+  createdBy: UserUpdateOneWithoutTagsInput
 }
 
 input TagUpdateManyInput {
@@ -414,6 +881,15 @@ input TagUpdateManyInput {
   connect: [TagWhereUniqueInput!]
   disconnect: [TagWhereUniqueInput!]
   delete: [TagWhereUniqueInput!]
+}
+
+input TagUpdateManyWithoutCreatedByInput {
+  create: [TagCreateWithoutCreatedByInput!]
+  connect: [TagWhereUniqueInput!]
+  disconnect: [TagWhereUniqueInput!]
+  delete: [TagWhereUniqueInput!]
+  update: [TagUpdateWithoutCreatedByInput!]
+  upsert: [TagUpsertWithoutCreatedByInput!]
 }
 
 input TagUpdateOneWithoutCategoryInput {
@@ -427,7 +903,7 @@ input TagUpdateOneWithoutCategoryInput {
 
 input TagUpdateWithoutCategoryDataInput {
   text: String
-  author: UserUpdateOneInput
+  createdBy: UserUpdateOneWithoutTagsInput
 }
 
 input TagUpdateWithoutCategoryInput {
@@ -435,10 +911,26 @@ input TagUpdateWithoutCategoryInput {
   data: TagUpdateWithoutCategoryDataInput!
 }
 
+input TagUpdateWithoutCreatedByDataInput {
+  text: String
+  category: TagUpdateOneWithoutCategoryInput
+}
+
+input TagUpdateWithoutCreatedByInput {
+  where: TagWhereUniqueInput!
+  data: TagUpdateWithoutCreatedByDataInput!
+}
+
 input TagUpsertWithoutCategoryInput {
   where: TagWhereUniqueInput!
   update: TagUpdateWithoutCategoryDataInput!
   create: TagCreateWithoutCategoryInput!
+}
+
+input TagUpsertWithoutCreatedByInput {
+  where: TagWhereUniqueInput!
+  update: TagUpdateWithoutCreatedByDataInput!
+  create: TagCreateWithoutCreatedByInput!
 }
 
 input TagWhereInput {
@@ -473,7 +965,7 @@ input TagWhereInput {
   text_ends_with: String
   text_not_ends_with: String
   category: TagWhereInput
-  author: UserWhereInput
+  createdBy: UserWhereInput
 }
 
 input TagWhereUniqueInput {
@@ -490,23 +982,86 @@ input UserCreateInput {
   email: String!
   password: String!
   name: String!
-  paragraphs: ParagraphCreateManyWithoutAuthorInput
+  notes: NoteCreateManyWithoutCreatedByInput
+  tags: TagCreateManyWithoutCreatedByInput
+  members: MemberCreateManyWithoutCreatedByInput
+  links: LinkCreateManyWithoutCreatedByInput
+  books: BookCreateManyWithoutCreatedByInput
 }
 
-input UserCreateOneInput {
-  create: UserCreateInput
+input UserCreateOneWithoutBooksInput {
+  create: UserCreateWithoutBooksInput
   connect: UserWhereUniqueInput
 }
 
-input UserCreateOneWithoutParagraphsInput {
-  create: UserCreateWithoutParagraphsInput
+input UserCreateOneWithoutLinksInput {
+  create: UserCreateWithoutLinksInput
   connect: UserWhereUniqueInput
 }
 
-input UserCreateWithoutParagraphsInput {
+input UserCreateOneWithoutMembersInput {
+  create: UserCreateWithoutMembersInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutNotesInput {
+  create: UserCreateWithoutNotesInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutTagsInput {
+  create: UserCreateWithoutTagsInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateWithoutBooksInput {
   email: String!
   password: String!
   name: String!
+  notes: NoteCreateManyWithoutCreatedByInput
+  tags: TagCreateManyWithoutCreatedByInput
+  members: MemberCreateManyWithoutCreatedByInput
+  links: LinkCreateManyWithoutCreatedByInput
+}
+
+input UserCreateWithoutLinksInput {
+  email: String!
+  password: String!
+  name: String!
+  notes: NoteCreateManyWithoutCreatedByInput
+  tags: TagCreateManyWithoutCreatedByInput
+  members: MemberCreateManyWithoutCreatedByInput
+  books: BookCreateManyWithoutCreatedByInput
+}
+
+input UserCreateWithoutMembersInput {
+  email: String!
+  password: String!
+  name: String!
+  notes: NoteCreateManyWithoutCreatedByInput
+  tags: TagCreateManyWithoutCreatedByInput
+  links: LinkCreateManyWithoutCreatedByInput
+  books: BookCreateManyWithoutCreatedByInput
+}
+
+input UserCreateWithoutNotesInput {
+  email: String!
+  password: String!
+  name: String!
+  tags: TagCreateManyWithoutCreatedByInput
+  members: MemberCreateManyWithoutCreatedByInput
+  links: LinkCreateManyWithoutCreatedByInput
+  books: BookCreateManyWithoutCreatedByInput
+}
+
+input UserCreateWithoutTagsInput {
+  email: String!
+  password: String!
+  name: String!
+  notes: NoteCreateManyWithoutCreatedByInput
+  members: MemberCreateManyWithoutCreatedByInput
+  links: LinkCreateManyWithoutCreatedByInput
+  books: BookCreateManyWithoutCreatedByInput
 }
 
 type UserEdge {
@@ -557,40 +1112,161 @@ input UserUpdateInput {
   email: String
   password: String
   name: String
-  paragraphs: ParagraphUpdateManyWithoutAuthorInput
+  notes: NoteUpdateManyWithoutCreatedByInput
+  tags: TagUpdateManyWithoutCreatedByInput
+  members: MemberUpdateManyWithoutCreatedByInput
+  links: LinkUpdateManyWithoutCreatedByInput
+  books: BookUpdateManyWithoutCreatedByInput
 }
 
-input UserUpdateOneInput {
-  create: UserCreateInput
+input UserUpdateOneWithoutBooksInput {
+  create: UserCreateWithoutBooksInput
   connect: UserWhereUniqueInput
   disconnect: UserWhereUniqueInput
   delete: UserWhereUniqueInput
+  update: UserUpdateWithoutBooksInput
+  upsert: UserUpsertWithoutBooksInput
 }
 
-input UserUpdateOneWithoutParagraphsInput {
-  create: UserCreateWithoutParagraphsInput
+input UserUpdateOneWithoutLinksInput {
+  create: UserCreateWithoutLinksInput
   connect: UserWhereUniqueInput
   disconnect: UserWhereUniqueInput
   delete: UserWhereUniqueInput
-  update: UserUpdateWithoutParagraphsInput
-  upsert: UserUpsertWithoutParagraphsInput
+  update: UserUpdateWithoutLinksInput
+  upsert: UserUpsertWithoutLinksInput
 }
 
-input UserUpdateWithoutParagraphsDataInput {
+input UserUpdateOneWithoutMembersInput {
+  create: UserCreateWithoutMembersInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+  update: UserUpdateWithoutMembersInput
+  upsert: UserUpsertWithoutMembersInput
+}
+
+input UserUpdateOneWithoutNotesInput {
+  create: UserCreateWithoutNotesInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+  update: UserUpdateWithoutNotesInput
+  upsert: UserUpsertWithoutNotesInput
+}
+
+input UserUpdateOneWithoutTagsInput {
+  create: UserCreateWithoutTagsInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+  update: UserUpdateWithoutTagsInput
+  upsert: UserUpsertWithoutTagsInput
+}
+
+input UserUpdateWithoutBooksDataInput {
   email: String
   password: String
   name: String
+  notes: NoteUpdateManyWithoutCreatedByInput
+  tags: TagUpdateManyWithoutCreatedByInput
+  members: MemberUpdateManyWithoutCreatedByInput
+  links: LinkUpdateManyWithoutCreatedByInput
 }
 
-input UserUpdateWithoutParagraphsInput {
+input UserUpdateWithoutBooksInput {
   where: UserWhereUniqueInput!
-  data: UserUpdateWithoutParagraphsDataInput!
+  data: UserUpdateWithoutBooksDataInput!
 }
 
-input UserUpsertWithoutParagraphsInput {
+input UserUpdateWithoutLinksDataInput {
+  email: String
+  password: String
+  name: String
+  notes: NoteUpdateManyWithoutCreatedByInput
+  tags: TagUpdateManyWithoutCreatedByInput
+  members: MemberUpdateManyWithoutCreatedByInput
+  books: BookUpdateManyWithoutCreatedByInput
+}
+
+input UserUpdateWithoutLinksInput {
   where: UserWhereUniqueInput!
-  update: UserUpdateWithoutParagraphsDataInput!
-  create: UserCreateWithoutParagraphsInput!
+  data: UserUpdateWithoutLinksDataInput!
+}
+
+input UserUpdateWithoutMembersDataInput {
+  email: String
+  password: String
+  name: String
+  notes: NoteUpdateManyWithoutCreatedByInput
+  tags: TagUpdateManyWithoutCreatedByInput
+  links: LinkUpdateManyWithoutCreatedByInput
+  books: BookUpdateManyWithoutCreatedByInput
+}
+
+input UserUpdateWithoutMembersInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutMembersDataInput!
+}
+
+input UserUpdateWithoutNotesDataInput {
+  email: String
+  password: String
+  name: String
+  tags: TagUpdateManyWithoutCreatedByInput
+  members: MemberUpdateManyWithoutCreatedByInput
+  links: LinkUpdateManyWithoutCreatedByInput
+  books: BookUpdateManyWithoutCreatedByInput
+}
+
+input UserUpdateWithoutNotesInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutNotesDataInput!
+}
+
+input UserUpdateWithoutTagsDataInput {
+  email: String
+  password: String
+  name: String
+  notes: NoteUpdateManyWithoutCreatedByInput
+  members: MemberUpdateManyWithoutCreatedByInput
+  links: LinkUpdateManyWithoutCreatedByInput
+  books: BookUpdateManyWithoutCreatedByInput
+}
+
+input UserUpdateWithoutTagsInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutTagsDataInput!
+}
+
+input UserUpsertWithoutBooksInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutBooksDataInput!
+  create: UserCreateWithoutBooksInput!
+}
+
+input UserUpsertWithoutLinksInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutLinksDataInput!
+  create: UserCreateWithoutLinksInput!
+}
+
+input UserUpsertWithoutMembersInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutMembersDataInput!
+  create: UserCreateWithoutMembersInput!
+}
+
+input UserUpsertWithoutNotesInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutNotesDataInput!
+  create: UserCreateWithoutNotesInput!
+}
+
+input UserUpsertWithoutTagsInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutTagsDataInput!
+  create: UserCreateWithoutTagsInput!
 }
 
 input UserWhereInput {
@@ -652,9 +1328,21 @@ input UserWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
-  paragraphs_every: ParagraphWhereInput
-  paragraphs_some: ParagraphWhereInput
-  paragraphs_none: ParagraphWhereInput
+  notes_every: NoteWhereInput
+  notes_some: NoteWhereInput
+  notes_none: NoteWhereInput
+  tags_every: TagWhereInput
+  tags_some: TagWhereInput
+  tags_none: TagWhereInput
+  members_every: MemberWhereInput
+  members_some: MemberWhereInput
+  members_none: MemberWhereInput
+  links_every: LinkWhereInput
+  links_some: LinkWhereInput
+  links_none: LinkWhereInput
+  books_every: BookWhereInput
+  books_some: BookWhereInput
+  books_none: BookWhereInput
 }
 
 input UserWhereUniqueInput {
@@ -663,17 +1351,17 @@ input UserWhereUniqueInput {
 }
 `
 
-export type ParagraphOrderByInput = 
+export type NoteOrderByInput = 
   'id_ASC' |
   'id_DESC' |
+  'title_ASC' |
+  'title_DESC' |
   'text_ASC' |
   'text_DESC' |
-  'status_ASC' |
-  'status_DESC' |
-  'level_ASC' |
-  'level_DESC' |
   'createdAt_ASC' |
   'createdAt_DESC' |
+  'date_ASC' |
+  'date_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC'
 
@@ -682,6 +1370,38 @@ export type TagOrderByInput =
   'id_DESC' |
   'text_ASC' |
   'text_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type MemberOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'name_ASC' |
+  'name_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type LinkOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'uri_ASC' |
+  'uri_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type BookOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'title_ASC' |
+  'title_DESC' |
+  'author_ASC' |
+  'author_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
   'createdAt_ASC' |
@@ -701,29 +1421,19 @@ export type UserOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
-export type Status = 
-  'TEXT' |
-  'ORDERED' |
-  'UNORDERED' |
-  'CHECKED' |
-  'UNCHECKED'
-
 export type MutationType = 
   'CREATED' |
   'UPDATED' |
   'DELETED'
 
-export interface ParagraphCreateWithoutAuthorInput {
-  text: String
-  status?: Status
-  level?: Int
-  tags?: TagCreateManyInput
-  story?: ParagraphCreateOneWithoutStoryInput
+export interface UserCreateOneWithoutBooksInput {
+  create?: UserCreateWithoutBooksInput
+  connect?: UserWhereUniqueInput
 }
 
-export interface ParagraphWhereInput {
-  AND?: ParagraphWhereInput[] | ParagraphWhereInput
-  OR?: ParagraphWhereInput[] | ParagraphWhereInput
+export interface NoteWhereInput {
+  AND?: NoteWhereInput[] | NoteWhereInput
+  OR?: NoteWhereInput[] | NoteWhereInput
   id?: ID_Input
   id_not?: ID_Input
   id_in?: ID_Input[] | ID_Input
@@ -738,6 +1448,20 @@ export interface ParagraphWhereInput {
   id_not_starts_with?: ID_Input
   id_ends_with?: ID_Input
   id_not_ends_with?: ID_Input
+  title?: String
+  title_not?: String
+  title_in?: String[] | String
+  title_not_in?: String[] | String
+  title_lt?: String
+  title_lte?: String
+  title_gt?: String
+  title_gte?: String
+  title_contains?: String
+  title_not_contains?: String
+  title_starts_with?: String
+  title_not_starts_with?: String
+  title_ends_with?: String
+  title_not_ends_with?: String
   text?: String
   text_not?: String
   text_in?: String[] | String
@@ -752,18 +1476,6 @@ export interface ParagraphWhereInput {
   text_not_starts_with?: String
   text_ends_with?: String
   text_not_ends_with?: String
-  status?: Status
-  status_not?: Status
-  status_in?: Status[] | Status
-  status_not_in?: Status[] | Status
-  level?: Int
-  level_not?: Int
-  level_in?: Int[] | Int
-  level_not_in?: Int[] | Int
-  level_lt?: Int
-  level_lte?: Int
-  level_gt?: Int
-  level_gte?: Int
   createdAt?: DateTime
   createdAt_not?: DateTime
   createdAt_in?: DateTime[] | DateTime
@@ -772,17 +1484,164 @@ export interface ParagraphWhereInput {
   createdAt_lte?: DateTime
   createdAt_gt?: DateTime
   createdAt_gte?: DateTime
+  date?: DateTime
+  date_not?: DateTime
+  date_in?: DateTime[] | DateTime
+  date_not_in?: DateTime[] | DateTime
+  date_lt?: DateTime
+  date_lte?: DateTime
+  date_gt?: DateTime
+  date_gte?: DateTime
   tags_every?: TagWhereInput
   tags_some?: TagWhereInput
   tags_none?: TagWhereInput
-  story?: ParagraphWhereInput
-  author?: UserWhereInput
+  members_every?: MemberWhereInput
+  members_some?: MemberWhereInput
+  members_none?: MemberWhereInput
+  links_every?: LinkWhereInput
+  links_some?: LinkWhereInput
+  links_none?: LinkWhereInput
+  createdBy?: UserWhereInput
 }
 
-export interface UserCreateWithoutParagraphsInput {
+export interface TagUpdateManyInput {
+  create?: TagCreateInput[] | TagCreateInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  disconnect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  delete?: TagWhereUniqueInput[] | TagWhereUniqueInput
+}
+
+export interface BookWhereInput {
+  AND?: BookWhereInput[] | BookWhereInput
+  OR?: BookWhereInput[] | BookWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  title?: String
+  title_not?: String
+  title_in?: String[] | String
+  title_not_in?: String[] | String
+  title_lt?: String
+  title_lte?: String
+  title_gt?: String
+  title_gte?: String
+  title_contains?: String
+  title_not_contains?: String
+  title_starts_with?: String
+  title_not_starts_with?: String
+  title_ends_with?: String
+  title_not_ends_with?: String
+  author?: String
+  author_not?: String
+  author_in?: String[] | String
+  author_not_in?: String[] | String
+  author_lt?: String
+  author_lte?: String
+  author_gt?: String
+  author_gte?: String
+  author_contains?: String
+  author_not_contains?: String
+  author_starts_with?: String
+  author_not_starts_with?: String
+  author_ends_with?: String
+  author_not_ends_with?: String
+  createdBy?: UserWhereInput
+}
+
+export interface UserCreateWithoutMembersInput {
   email: String
   password: String
   name: String
+  notes?: NoteCreateManyWithoutCreatedByInput
+  tags?: TagCreateManyWithoutCreatedByInput
+  links?: LinkCreateManyWithoutCreatedByInput
+  books?: BookCreateManyWithoutCreatedByInput
+}
+
+export interface BookUpdateWithoutCreatedByDataInput {
+  title?: String
+  author?: String
+}
+
+export interface TagCreateManyWithoutCreatedByInput {
+  create?: TagCreateWithoutCreatedByInput[] | TagCreateWithoutCreatedByInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+}
+
+export interface MemberUpdateManyInput {
+  create?: MemberCreateInput[] | MemberCreateInput
+  connect?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+  disconnect?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+  delete?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+}
+
+export interface TagCreateWithoutCreatedByInput {
+  text: String
+  category?: TagCreateOneWithoutCategoryInput
+}
+
+export interface UserSubscriptionWhereInput {
+  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: UserWhereInput
+}
+
+export interface LinkCreateManyWithoutCreatedByInput {
+  create?: LinkCreateWithoutCreatedByInput[] | LinkCreateWithoutCreatedByInput
+  connect?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+}
+
+export interface MemberWhereInput {
+  AND?: MemberWhereInput[] | MemberWhereInput
+  OR?: MemberWhereInput[] | MemberWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  name?: String
+  name_not?: String
+  name_in?: String[] | String
+  name_not_in?: String[] | String
+  name_lt?: String
+  name_lte?: String
+  name_gt?: String
+  name_gte?: String
+  name_contains?: String
+  name_not_contains?: String
+  name_starts_with?: String
+  name_not_starts_with?: String
+  name_ends_with?: String
+  name_not_ends_with?: String
+  createdBy?: UserWhereInput
+}
+
+export interface LinkCreateWithoutCreatedByInput {
+  uri: String
 }
 
 export interface UserWhereInput {
@@ -844,149 +1703,26 @@ export interface UserWhereInput {
   name_not_starts_with?: String
   name_ends_with?: String
   name_not_ends_with?: String
-  paragraphs_every?: ParagraphWhereInput
-  paragraphs_some?: ParagraphWhereInput
-  paragraphs_none?: ParagraphWhereInput
+  notes_every?: NoteWhereInput
+  notes_some?: NoteWhereInput
+  notes_none?: NoteWhereInput
+  tags_every?: TagWhereInput
+  tags_some?: TagWhereInput
+  tags_none?: TagWhereInput
+  members_every?: MemberWhereInput
+  members_some?: MemberWhereInput
+  members_none?: MemberWhereInput
+  links_every?: LinkWhereInput
+  links_some?: LinkWhereInput
+  links_none?: LinkWhereInput
+  books_every?: BookWhereInput
+  books_some?: BookWhereInput
+  books_none?: BookWhereInput
 }
 
-export interface TagCreateManyInput {
-  create?: TagCreateInput[] | TagCreateInput
-  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
-}
-
-export interface UserUpdateWithoutParagraphsDataInput {
-  email?: String
-  password?: String
-  name?: String
-}
-
-export interface TagCreateInput {
-  text: String
-  category?: TagCreateOneWithoutCategoryInput
-  author: UserCreateOneInput
-}
-
-export interface ParagraphUpdateInput {
-  text?: String
-  status?: Status
-  level?: Int
-  tags?: TagUpdateManyInput
-  story?: ParagraphUpdateOneWithoutStoryInput
-  author?: UserUpdateOneWithoutParagraphsInput
-}
-
-export interface TagCreateOneWithoutCategoryInput {
-  create?: TagCreateWithoutCategoryInput
-  connect?: TagWhereUniqueInput
-}
-
-export interface TagSubscriptionWhereInput {
-  AND?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
-  OR?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: TagWhereInput
-}
-
-export interface TagCreateWithoutCategoryInput {
-  text: String
-  author: UserCreateOneInput
-}
-
-export interface ParagraphUpsertWithoutAuthorInput {
-  where: ParagraphWhereUniqueInput
-  update: ParagraphUpdateWithoutAuthorDataInput
-  create: ParagraphCreateWithoutAuthorInput
-}
-
-export interface UserCreateOneInput {
-  create?: UserCreateInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface TagWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface UserCreateInput {
-  email: String
-  password: String
-  name: String
-  paragraphs?: ParagraphCreateManyWithoutAuthorInput
-}
-
-export interface ParagraphUpdateWithoutAuthorDataInput {
-  text?: String
-  status?: Status
-  level?: Int
-  tags?: TagUpdateManyInput
-  story?: ParagraphUpdateOneWithoutStoryInput
-}
-
-export interface ParagraphCreateManyWithoutAuthorInput {
-  create?: ParagraphCreateWithoutAuthorInput[] | ParagraphCreateWithoutAuthorInput
-  connect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
-}
-
-export interface ParagraphUpdateManyWithoutAuthorInput {
-  create?: ParagraphCreateWithoutAuthorInput[] | ParagraphCreateWithoutAuthorInput
-  connect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
-  disconnect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
-  delete?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
-  update?: ParagraphUpdateWithoutAuthorInput[] | ParagraphUpdateWithoutAuthorInput
-  upsert?: ParagraphUpsertWithoutAuthorInput[] | ParagraphUpsertWithoutAuthorInput
-}
-
-export interface UserUpsertWithoutParagraphsInput {
-  where: UserWhereUniqueInput
-  update: UserUpdateWithoutParagraphsDataInput
-  create: UserCreateWithoutParagraphsInput
-}
-
-export interface TagUpsertWithoutCategoryInput {
-  where: TagWhereUniqueInput
-  update: TagUpdateWithoutCategoryDataInput
-  create: TagCreateWithoutCategoryInput
-}
-
-export interface ParagraphCreateOneWithoutStoryInput {
-  create?: ParagraphCreateWithoutStoryInput
-  connect?: ParagraphWhereUniqueInput
-}
-
-export interface TagUpdateWithoutCategoryDataInput {
-  text?: String
-  author?: UserUpdateOneInput
-}
-
-export interface ParagraphCreateWithoutStoryInput {
-  text: String
-  status?: Status
-  level?: Int
-  tags?: TagCreateManyInput
-  author: UserCreateOneWithoutParagraphsInput
-}
-
-export interface TagUpdateOneWithoutCategoryInput {
-  create?: TagCreateWithoutCategoryInput
-  connect?: TagWhereUniqueInput
-  disconnect?: TagWhereUniqueInput
-  delete?: TagWhereUniqueInput
-  update?: TagUpdateWithoutCategoryInput
-  upsert?: TagUpsertWithoutCategoryInput
-}
-
-export interface UserCreateOneWithoutParagraphsInput {
-  create?: UserCreateWithoutParagraphsInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface ParagraphUpsertWithoutStoryInput {
-  where: ParagraphWhereUniqueInput
-  update: ParagraphUpdateWithoutStoryDataInput
-  create: ParagraphCreateWithoutStoryInput
+export interface BookCreateManyWithoutCreatedByInput {
+  create?: BookCreateWithoutCreatedByInput[] | BookCreateWithoutCreatedByInput
+  connect?: BookWhereUniqueInput[] | BookWhereUniqueInput
 }
 
 export interface TagWhereInput {
@@ -1021,103 +1757,45 @@ export interface TagWhereInput {
   text_ends_with?: String
   text_not_ends_with?: String
   category?: TagWhereInput
-  author?: UserWhereInput
+  createdBy?: UserWhereInput
 }
 
-export interface UserSubscriptionWhereInput {
-  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
-  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+export interface BookCreateWithoutCreatedByInput {
+  title: String
+  author?: String
+}
+
+export interface NoteSubscriptionWhereInput {
+  AND?: NoteSubscriptionWhereInput[] | NoteSubscriptionWhereInput
+  OR?: NoteSubscriptionWhereInput[] | NoteSubscriptionWhereInput
   mutation_in?: MutationType[] | MutationType
   updatedFields_contains?: String
   updatedFields_contains_every?: String[] | String
   updatedFields_contains_some?: String[] | String
-  node?: UserWhereInput
+  node?: NoteWhereInput
 }
 
-export interface ParagraphWhereUniqueInput {
+export interface LinkCreateManyInput {
+  create?: LinkCreateInput[] | LinkCreateInput
+  connect?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+}
+
+export interface TagWhereUniqueInput {
   id?: ID_Input
 }
 
-export interface ParagraphUpdateWithoutAuthorInput {
-  where: ParagraphWhereUniqueInput
-  data: ParagraphUpdateWithoutAuthorDataInput
+export interface LinkCreateInput {
+  uri: String
+  createdBy: UserCreateOneWithoutLinksInput
 }
 
-export interface TagUpdateManyInput {
-  create?: TagCreateInput[] | TagCreateInput
-  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
-  disconnect?: TagWhereUniqueInput[] | TagWhereUniqueInput
-  delete?: TagWhereUniqueInput[] | TagWhereUniqueInput
+export interface BookWhereUniqueInput {
+  id?: ID_Input
 }
 
-export interface UserUpdateOneInput {
-  create?: UserCreateInput
+export interface UserCreateOneWithoutLinksInput {
+  create?: UserCreateWithoutLinksInput
   connect?: UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput
-  delete?: UserWhereUniqueInput
-}
-
-export interface ParagraphUpdateOneWithoutStoryInput {
-  create?: ParagraphCreateWithoutStoryInput
-  connect?: ParagraphWhereUniqueInput
-  disconnect?: ParagraphWhereUniqueInput
-  delete?: ParagraphWhereUniqueInput
-  update?: ParagraphUpdateWithoutStoryInput
-  upsert?: ParagraphUpsertWithoutStoryInput
-}
-
-export interface TagUpdateInput {
-  text?: String
-  category?: TagUpdateOneWithoutCategoryInput
-  author?: UserUpdateOneInput
-}
-
-export interface UserUpdateWithoutParagraphsInput {
-  where: UserWhereUniqueInput
-  data: UserUpdateWithoutParagraphsDataInput
-}
-
-export interface UserUpdateOneWithoutParagraphsInput {
-  create?: UserCreateWithoutParagraphsInput
-  connect?: UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput
-  delete?: UserWhereUniqueInput
-  update?: UserUpdateWithoutParagraphsInput
-  upsert?: UserUpsertWithoutParagraphsInput
-}
-
-export interface ParagraphUpdateWithoutStoryDataInput {
-  text?: String
-  status?: Status
-  level?: Int
-  tags?: TagUpdateManyInput
-  author?: UserUpdateOneWithoutParagraphsInput
-}
-
-export interface ParagraphUpdateWithoutStoryInput {
-  where: ParagraphWhereUniqueInput
-  data: ParagraphUpdateWithoutStoryDataInput
-}
-
-export interface ParagraphCreateInput {
-  text: String
-  status?: Status
-  level?: Int
-  tags?: TagCreateManyInput
-  story?: ParagraphCreateOneWithoutStoryInput
-  author: UserCreateOneWithoutParagraphsInput
-}
-
-export interface TagUpdateWithoutCategoryInput {
-  where: TagWhereUniqueInput
-  data: TagUpdateWithoutCategoryDataInput
-}
-
-export interface UserUpdateInput {
-  email?: String
-  password?: String
-  name?: String
-  paragraphs?: ParagraphUpdateManyWithoutAuthorInput
 }
 
 export interface UserWhereUniqueInput {
@@ -1125,14 +1803,574 @@ export interface UserWhereUniqueInput {
   email?: String
 }
 
-export interface ParagraphSubscriptionWhereInput {
-  AND?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
-  OR?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
+export interface UserCreateWithoutLinksInput {
+  email: String
+  password: String
+  name: String
+  notes?: NoteCreateManyWithoutCreatedByInput
+  tags?: TagCreateManyWithoutCreatedByInput
+  members?: MemberCreateManyWithoutCreatedByInput
+  books?: BookCreateManyWithoutCreatedByInput
+}
+
+export interface UserUpsertWithoutLinksInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutLinksDataInput
+  create: UserCreateWithoutLinksInput
+}
+
+export interface MemberCreateManyWithoutCreatedByInput {
+  create?: MemberCreateWithoutCreatedByInput[] | MemberCreateWithoutCreatedByInput
+  connect?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+}
+
+export interface UserUpdateWithoutLinksInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutLinksDataInput
+}
+
+export interface MemberCreateWithoutCreatedByInput {
+  name: String
+}
+
+export interface LinkUpdateInput {
+  uri?: String
+  createdBy?: UserUpdateOneWithoutLinksInput
+}
+
+export interface UserCreateOneWithoutNotesInput {
+  create?: UserCreateWithoutNotesInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface UserUpdateWithoutBooksDataInput {
+  email?: String
+  password?: String
+  name?: String
+  notes?: NoteUpdateManyWithoutCreatedByInput
+  tags?: TagUpdateManyWithoutCreatedByInput
+  members?: MemberUpdateManyWithoutCreatedByInput
+  links?: LinkUpdateManyWithoutCreatedByInput
+}
+
+export interface UserCreateWithoutNotesInput {
+  email: String
+  password: String
+  name: String
+  tags?: TagCreateManyWithoutCreatedByInput
+  members?: MemberCreateManyWithoutCreatedByInput
+  links?: LinkCreateManyWithoutCreatedByInput
+  books?: BookCreateManyWithoutCreatedByInput
+}
+
+export interface UserUpdateOneWithoutBooksInput {
+  create?: UserCreateWithoutBooksInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutBooksInput
+  upsert?: UserUpsertWithoutBooksInput
+}
+
+export interface BookCreateInput {
+  title: String
+  author?: String
+  createdBy: UserCreateOneWithoutBooksInput
+}
+
+export interface UserUpsertWithoutMembersInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutMembersDataInput
+  create: UserCreateWithoutMembersInput
+}
+
+export interface UserUpsertWithoutTagsInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutTagsDataInput
+  create: UserCreateWithoutTagsInput
+}
+
+export interface UserUpdateWithoutMembersInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutMembersDataInput
+}
+
+export interface UserCreateWithoutBooksInput {
+  email: String
+  password: String
+  name: String
+  notes?: NoteCreateManyWithoutCreatedByInput
+  tags?: TagCreateManyWithoutCreatedByInput
+  members?: MemberCreateManyWithoutCreatedByInput
+  links?: LinkCreateManyWithoutCreatedByInput
+}
+
+export interface MemberUpdateInput {
+  name?: String
+  createdBy?: UserUpdateOneWithoutMembersInput
+}
+
+export interface UserCreateInput {
+  email: String
+  password: String
+  name: String
+  notes?: NoteCreateManyWithoutCreatedByInput
+  tags?: TagCreateManyWithoutCreatedByInput
+  members?: MemberCreateManyWithoutCreatedByInput
+  links?: LinkCreateManyWithoutCreatedByInput
+  books?: BookCreateManyWithoutCreatedByInput
+}
+
+export interface UserUpsertWithoutNotesInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutNotesDataInput
+  create: UserCreateWithoutNotesInput
+}
+
+export interface NoteUpdateInput {
+  title?: String
+  text?: String
+  date?: DateTime
+  tags?: TagUpdateManyInput
+  members?: MemberUpdateManyInput
+  links?: LinkUpdateManyInput
+  createdBy?: UserUpdateOneWithoutNotesInput
+}
+
+export interface TagUpsertWithoutCategoryInput {
+  where: TagWhereUniqueInput
+  update: TagUpdateWithoutCategoryDataInput
+  create: TagCreateWithoutCategoryInput
+}
+
+export interface BookUpsertWithoutCreatedByInput {
+  where: BookWhereUniqueInput
+  update: BookUpdateWithoutCreatedByDataInput
+  create: BookCreateWithoutCreatedByInput
+}
+
+export interface TagCreateManyInput {
+  create?: TagCreateInput[] | TagCreateInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+}
+
+export interface TagCreateOneWithoutCategoryInput {
+  create?: TagCreateWithoutCategoryInput
+  connect?: TagWhereUniqueInput
+}
+
+export interface UserCreateOneWithoutTagsInput {
+  create?: UserCreateWithoutTagsInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface LinkUpdateManyInput {
+  create?: LinkCreateInput[] | LinkCreateInput
+  connect?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+  disconnect?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+  delete?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+}
+
+export interface NoteCreateManyWithoutCreatedByInput {
+  create?: NoteCreateWithoutCreatedByInput[] | NoteCreateWithoutCreatedByInput
+  connect?: NoteWhereUniqueInput[] | NoteWhereUniqueInput
+}
+
+export interface UserUpdateOneWithoutNotesInput {
+  create?: UserCreateWithoutNotesInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutNotesInput
+  upsert?: UserUpsertWithoutNotesInput
+}
+
+export interface MemberCreateManyInput {
+  create?: MemberCreateInput[] | MemberCreateInput
+  connect?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+}
+
+export interface UserUpdateWithoutNotesInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutNotesDataInput
+}
+
+export interface UserCreateOneWithoutMembersInput {
+  create?: UserCreateWithoutMembersInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface UserUpdateWithoutNotesDataInput {
+  email?: String
+  password?: String
+  name?: String
+  tags?: TagUpdateManyWithoutCreatedByInput
+  members?: MemberUpdateManyWithoutCreatedByInput
+  links?: LinkUpdateManyWithoutCreatedByInput
+  books?: BookUpdateManyWithoutCreatedByInput
+}
+
+export interface LinkSubscriptionWhereInput {
+  AND?: LinkSubscriptionWhereInput[] | LinkSubscriptionWhereInput
+  OR?: LinkSubscriptionWhereInput[] | LinkSubscriptionWhereInput
   mutation_in?: MutationType[] | MutationType
   updatedFields_contains?: String
   updatedFields_contains_every?: String[] | String
   updatedFields_contains_some?: String[] | String
-  node?: ParagraphWhereInput
+  node?: LinkWhereInput
+}
+
+export interface TagUpdateManyWithoutCreatedByInput {
+  create?: TagCreateWithoutCreatedByInput[] | TagCreateWithoutCreatedByInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  disconnect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  delete?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  update?: TagUpdateWithoutCreatedByInput[] | TagUpdateWithoutCreatedByInput
+  upsert?: TagUpsertWithoutCreatedByInput[] | TagUpsertWithoutCreatedByInput
+}
+
+export interface MemberSubscriptionWhereInput {
+  AND?: MemberSubscriptionWhereInput[] | MemberSubscriptionWhereInput
+  OR?: MemberSubscriptionWhereInput[] | MemberSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: MemberWhereInput
+}
+
+export interface TagUpdateWithoutCreatedByInput {
+  where: TagWhereUniqueInput
+  data: TagUpdateWithoutCreatedByDataInput
+}
+
+export interface NoteWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface TagUpdateWithoutCreatedByDataInput {
+  text?: String
+  category?: TagUpdateOneWithoutCategoryInput
+}
+
+export interface LinkWhereUniqueInput {
+  id?: ID_Input
+  uri?: String
+}
+
+export interface TagUpdateOneWithoutCategoryInput {
+  create?: TagCreateWithoutCategoryInput
+  connect?: TagWhereUniqueInput
+  disconnect?: TagWhereUniqueInput
+  delete?: TagWhereUniqueInput
+  update?: TagUpdateWithoutCategoryInput
+  upsert?: TagUpsertWithoutCategoryInput
+}
+
+export interface UserUpdateWithoutLinksDataInput {
+  email?: String
+  password?: String
+  name?: String
+  notes?: NoteUpdateManyWithoutCreatedByInput
+  tags?: TagUpdateManyWithoutCreatedByInput
+  members?: MemberUpdateManyWithoutCreatedByInput
+  books?: BookUpdateManyWithoutCreatedByInput
+}
+
+export interface TagUpdateWithoutCategoryInput {
+  where: TagWhereUniqueInput
+  data: TagUpdateWithoutCategoryDataInput
+}
+
+export interface UserUpsertWithoutBooksInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutBooksDataInput
+  create: UserCreateWithoutBooksInput
+}
+
+export interface TagUpdateWithoutCategoryDataInput {
+  text?: String
+  createdBy?: UserUpdateOneWithoutTagsInput
+}
+
+export interface BookUpdateInput {
+  title?: String
+  author?: String
+  createdBy?: UserUpdateOneWithoutBooksInput
+}
+
+export interface UserUpdateOneWithoutTagsInput {
+  create?: UserCreateWithoutTagsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutTagsInput
+  upsert?: UserUpsertWithoutTagsInput
+}
+
+export interface UserUpdateOneWithoutMembersInput {
+  create?: UserCreateWithoutMembersInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutMembersInput
+  upsert?: UserUpsertWithoutMembersInput
+}
+
+export interface UserUpdateWithoutTagsInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutTagsDataInput
+}
+
+export interface TagUpsertWithoutCreatedByInput {
+  where: TagWhereUniqueInput
+  update: TagUpdateWithoutCreatedByDataInput
+  create: TagCreateWithoutCreatedByInput
+}
+
+export interface UserUpdateWithoutTagsDataInput {
+  email?: String
+  password?: String
+  name?: String
+  notes?: NoteUpdateManyWithoutCreatedByInput
+  members?: MemberUpdateManyWithoutCreatedByInput
+  links?: LinkUpdateManyWithoutCreatedByInput
+  books?: BookUpdateManyWithoutCreatedByInput
+}
+
+export interface TagCreateInput {
+  text: String
+  category?: TagCreateOneWithoutCategoryInput
+  createdBy: UserCreateOneWithoutTagsInput
+}
+
+export interface NoteUpdateManyWithoutCreatedByInput {
+  create?: NoteCreateWithoutCreatedByInput[] | NoteCreateWithoutCreatedByInput
+  connect?: NoteWhereUniqueInput[] | NoteWhereUniqueInput
+  disconnect?: NoteWhereUniqueInput[] | NoteWhereUniqueInput
+  delete?: NoteWhereUniqueInput[] | NoteWhereUniqueInput
+  update?: NoteUpdateWithoutCreatedByInput[] | NoteUpdateWithoutCreatedByInput
+  upsert?: NoteUpsertWithoutCreatedByInput[] | NoteUpsertWithoutCreatedByInput
+}
+
+export interface UserCreateWithoutTagsInput {
+  email: String
+  password: String
+  name: String
+  notes?: NoteCreateManyWithoutCreatedByInput
+  members?: MemberCreateManyWithoutCreatedByInput
+  links?: LinkCreateManyWithoutCreatedByInput
+  books?: BookCreateManyWithoutCreatedByInput
+}
+
+export interface NoteUpdateWithoutCreatedByInput {
+  where: NoteWhereUniqueInput
+  data: NoteUpdateWithoutCreatedByDataInput
+}
+
+export interface MemberCreateInput {
+  name: String
+  createdBy: UserCreateOneWithoutMembersInput
+}
+
+export interface NoteUpdateWithoutCreatedByDataInput {
+  title?: String
+  text?: String
+  date?: DateTime
+  tags?: TagUpdateManyInput
+  members?: MemberUpdateManyInput
+  links?: LinkUpdateManyInput
+}
+
+export interface BookSubscriptionWhereInput {
+  AND?: BookSubscriptionWhereInput[] | BookSubscriptionWhereInput
+  OR?: BookSubscriptionWhereInput[] | BookSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: BookWhereInput
+}
+
+export interface NoteUpsertWithoutCreatedByInput {
+  where: NoteWhereUniqueInput
+  update: NoteUpdateWithoutCreatedByDataInput
+  create: NoteCreateWithoutCreatedByInput
+}
+
+export interface MemberWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface MemberUpdateManyWithoutCreatedByInput {
+  create?: MemberCreateWithoutCreatedByInput[] | MemberCreateWithoutCreatedByInput
+  connect?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+  disconnect?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+  delete?: MemberWhereUniqueInput[] | MemberWhereUniqueInput
+  update?: MemberUpdateWithoutCreatedByInput[] | MemberUpdateWithoutCreatedByInput
+  upsert?: MemberUpsertWithoutCreatedByInput[] | MemberUpsertWithoutCreatedByInput
+}
+
+export interface UserUpdateOneWithoutLinksInput {
+  create?: UserCreateWithoutLinksInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutLinksInput
+  upsert?: UserUpsertWithoutLinksInput
+}
+
+export interface MemberUpdateWithoutCreatedByInput {
+  where: MemberWhereUniqueInput
+  data: MemberUpdateWithoutCreatedByDataInput
+}
+
+export interface UserUpdateWithoutMembersDataInput {
+  email?: String
+  password?: String
+  name?: String
+  notes?: NoteUpdateManyWithoutCreatedByInput
+  tags?: TagUpdateManyWithoutCreatedByInput
+  links?: LinkUpdateManyWithoutCreatedByInput
+  books?: BookUpdateManyWithoutCreatedByInput
+}
+
+export interface MemberUpdateWithoutCreatedByDataInput {
+  name?: String
+}
+
+export interface NoteCreateInput {
+  title?: String
+  text: String
+  date?: DateTime
+  tags?: TagCreateManyInput
+  members?: MemberCreateManyInput
+  links?: LinkCreateManyInput
+  createdBy: UserCreateOneWithoutNotesInput
+}
+
+export interface MemberUpsertWithoutCreatedByInput {
+  where: MemberWhereUniqueInput
+  update: MemberUpdateWithoutCreatedByDataInput
+  create: MemberCreateWithoutCreatedByInput
+}
+
+export interface NoteCreateWithoutCreatedByInput {
+  title?: String
+  text: String
+  date?: DateTime
+  tags?: TagCreateManyInput
+  members?: MemberCreateManyInput
+  links?: LinkCreateManyInput
+}
+
+export interface LinkUpdateManyWithoutCreatedByInput {
+  create?: LinkCreateWithoutCreatedByInput[] | LinkCreateWithoutCreatedByInput
+  connect?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+  disconnect?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+  delete?: LinkWhereUniqueInput[] | LinkWhereUniqueInput
+  update?: LinkUpdateWithoutCreatedByInput[] | LinkUpdateWithoutCreatedByInput
+  upsert?: LinkUpsertWithoutCreatedByInput[] | LinkUpsertWithoutCreatedByInput
+}
+
+export interface TagSubscriptionWhereInput {
+  AND?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
+  OR?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: TagWhereInput
+}
+
+export interface LinkUpdateWithoutCreatedByInput {
+  where: LinkWhereUniqueInput
+  data: LinkUpdateWithoutCreatedByDataInput
+}
+
+export interface UserUpdateWithoutBooksInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutBooksDataInput
+}
+
+export interface BookUpdateWithoutCreatedByInput {
+  where: BookWhereUniqueInput
+  data: BookUpdateWithoutCreatedByDataInput
+}
+
+export interface BookUpdateManyWithoutCreatedByInput {
+  create?: BookCreateWithoutCreatedByInput[] | BookCreateWithoutCreatedByInput
+  connect?: BookWhereUniqueInput[] | BookWhereUniqueInput
+  disconnect?: BookWhereUniqueInput[] | BookWhereUniqueInput
+  delete?: BookWhereUniqueInput[] | BookWhereUniqueInput
+  update?: BookUpdateWithoutCreatedByInput[] | BookUpdateWithoutCreatedByInput
+  upsert?: BookUpsertWithoutCreatedByInput[] | BookUpsertWithoutCreatedByInput
+}
+
+export interface LinkUpsertWithoutCreatedByInput {
+  where: LinkWhereUniqueInput
+  update: LinkUpdateWithoutCreatedByDataInput
+  create: LinkCreateWithoutCreatedByInput
+}
+
+export interface LinkUpdateWithoutCreatedByDataInput {
+  uri?: String
+}
+
+export interface TagUpdateInput {
+  text?: String
+  category?: TagUpdateOneWithoutCategoryInput
+  createdBy?: UserUpdateOneWithoutTagsInput
+}
+
+export interface UserUpdateInput {
+  email?: String
+  password?: String
+  name?: String
+  notes?: NoteUpdateManyWithoutCreatedByInput
+  tags?: TagUpdateManyWithoutCreatedByInput
+  members?: MemberUpdateManyWithoutCreatedByInput
+  links?: LinkUpdateManyWithoutCreatedByInput
+  books?: BookUpdateManyWithoutCreatedByInput
+}
+
+export interface LinkWhereInput {
+  AND?: LinkWhereInput[] | LinkWhereInput
+  OR?: LinkWhereInput[] | LinkWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  uri?: String
+  uri_not?: String
+  uri_in?: String[] | String
+  uri_not_in?: String[] | String
+  uri_lt?: String
+  uri_lte?: String
+  uri_gt?: String
+  uri_gte?: String
+  uri_contains?: String
+  uri_not_contains?: String
+  uri_starts_with?: String
+  uri_not_starts_with?: String
+  uri_ends_with?: String
+  uri_not_ends_with?: String
+  createdBy?: UserWhereInput
+}
+
+export interface TagCreateWithoutCategoryInput {
+  text: String
+  createdBy: UserCreateOneWithoutTagsInput
 }
 
 export interface Node {
@@ -1146,39 +2384,54 @@ export interface UserPreviousValues {
   name: String
 }
 
-export interface PageInfo {
-  hasNextPage: Boolean
-  hasPreviousPage: Boolean
-  startCursor?: String
-  endCursor?: String
+export interface NoteConnection {
+  pageInfo: PageInfo
+  edges: NoteEdge[]
+  aggregate: AggregateNote
+}
+
+export interface Note extends Node {
+  id: ID_Output
+  title?: String
+  text: String
+  tags?: Tag[]
+  members?: Member[]
+  links?: Link[]
+  createdAt: DateTime
+  createdBy: User
+  date?: DateTime
+}
+
+export interface BatchPayload {
+  count: Long
+}
+
+export interface AggregateUser {
+  count: Int
 }
 
 export interface Tag extends Node {
   id: ID_Output
   text: String
   category?: Tag
-  author: User
+  createdBy: User
 }
 
-export interface ParagraphConnection {
-  pageInfo: PageInfo
-  edges: ParagraphEdge[]
-  aggregate: AggregateParagraph
-}
-
-export interface Paragraph extends Node {
+export interface User extends Node {
   id: ID_Output
-  text: String
-  status: Status
-  level: Int
+  email: String
+  password: String
+  name: String
+  notes?: Note[]
   tags?: Tag[]
-  story?: Paragraph
-  author: User
-  createdAt: DateTime
+  members?: Member[]
+  links?: Link[]
+  books?: Book[]
 }
 
-export interface AggregateUser {
-  count: Int
+export interface UserEdge {
+  node: User
+  cursor: String
 }
 
 export interface UserConnection {
@@ -1187,8 +2440,56 @@ export interface UserConnection {
   aggregate: AggregateUser
 }
 
-export interface BatchPayload {
-  count: Long
+export interface AggregateLink {
+  count: Int
+}
+
+export interface LinkConnection {
+  pageInfo: PageInfo
+  edges: LinkEdge[]
+  aggregate: AggregateLink
+}
+
+export interface LinkPreviousValues {
+  id: ID_Output
+  uri: String
+}
+
+export interface BookEdge {
+  node: Book
+  cursor: String
+}
+
+export interface LinkSubscriptionPayload {
+  mutation: MutationType
+  node?: Link
+  updatedFields?: String[]
+  previousValues?: LinkPreviousValues
+}
+
+export interface AggregateMember {
+  count: Int
+}
+
+export interface NoteSubscriptionPayload {
+  mutation: MutationType
+  node?: Note
+  updatedFields?: String[]
+  previousValues?: NotePreviousValues
+}
+
+export interface MemberConnection {
+  pageInfo: PageInfo
+  edges: MemberEdge[]
+  aggregate: AggregateMember
+}
+
+export interface NotePreviousValues {
+  id: ID_Output
+  title?: String
+  text: String
+  createdAt: DateTime
+  date?: DateTime
 }
 
 export interface TagEdge {
@@ -1196,35 +2497,15 @@ export interface TagEdge {
   cursor: String
 }
 
-export interface TagPreviousValues {
+export interface Book extends Node {
   id: ID_Output
-  text: String
+  title: String
+  author?: String
+  createdBy: User
 }
 
-export interface AggregateParagraph {
+export interface AggregateNote {
   count: Int
-}
-
-export interface UserSubscriptionPayload {
-  mutation: MutationType
-  node?: User
-  updatedFields?: String[]
-  previousValues?: UserPreviousValues
-}
-
-export interface ParagraphPreviousValues {
-  id: ID_Output
-  text: String
-  status: Status
-  level: Int
-  createdAt: DateTime
-}
-
-export interface ParagraphSubscriptionPayload {
-  mutation: MutationType
-  node?: Paragraph
-  updatedFields?: String[]
-  previousValues?: ParagraphPreviousValues
 }
 
 export interface TagSubscriptionPayload {
@@ -1234,22 +2515,80 @@ export interface TagSubscriptionPayload {
   previousValues?: TagPreviousValues
 }
 
-export interface User extends Node {
+export interface UserSubscriptionPayload {
+  mutation: MutationType
+  node?: User
+  updatedFields?: String[]
+  previousValues?: UserPreviousValues
+}
+
+export interface TagPreviousValues {
   id: ID_Output
-  email: String
-  password: String
+  text: String
+}
+
+export interface LinkEdge {
+  node: Link
+  cursor: String
+}
+
+export interface Link extends Node {
+  id: ID_Output
+  uri: String
+  createdBy: User
+}
+
+export interface BookConnection {
+  pageInfo: PageInfo
+  edges: BookEdge[]
+  aggregate: AggregateBook
+}
+
+export interface MemberSubscriptionPayload {
+  mutation: MutationType
+  node?: Member
+  updatedFields?: String[]
+  previousValues?: MemberPreviousValues
+}
+
+export interface AggregateTag {
+  count: Int
+}
+
+export interface NoteEdge {
+  node: Note
+  cursor: String
+}
+
+export interface BookPreviousValues {
+  id: ID_Output
+  title: String
+  author?: String
+}
+
+export interface BookSubscriptionPayload {
+  mutation: MutationType
+  node?: Book
+  updatedFields?: String[]
+  previousValues?: BookPreviousValues
+}
+
+export interface Member extends Node {
+  id: ID_Output
   name: String
-  paragraphs?: Paragraph[]
+  createdBy: User
 }
 
-export interface UserEdge {
-  node: User
-  cursor: String
+export interface MemberPreviousValues {
+  id: ID_Output
+  name: String
 }
 
-export interface ParagraphEdge {
-  node: Paragraph
-  cursor: String
+export interface PageInfo {
+  hasNextPage: Boolean
+  hasPreviousPage: Boolean
+  startCursor?: String
+  endCursor?: String
 }
 
 export interface TagConnection {
@@ -1258,9 +2597,16 @@ export interface TagConnection {
   aggregate: AggregateTag
 }
 
-export interface AggregateTag {
+export interface MemberEdge {
+  node: Member
+  cursor: String
+}
+
+export interface AggregateBook {
   count: Int
 }
+
+export type Long = string
 
 /*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
@@ -1268,19 +2614,17 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 export type Int = number
 
 /*
+The `Boolean` scalar type represents `true` or `false`.
+*/
+export type Boolean = boolean
+
+/*
 The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
 */
 export type ID_Input = string | number
 export type ID_Output = string
 
-/*
-The `Boolean` scalar type represents `true` or `false`.
-*/
-export type Boolean = boolean
-
 export type DateTime = string
-
-export type Long = string
 
 /*
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
@@ -1294,42 +2638,72 @@ export interface Schema {
 }
 
 export type Query = {
-  paragraphs: (args: { where?: ParagraphWhereInput, orderBy?: ParagraphOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Paragraph[]>
+  notes: (args: { where?: NoteWhereInput, orderBy?: NoteOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Note[]>
   tags: (args: { where?: TagWhereInput, orderBy?: TagOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Tag[]>
+  members: (args: { where?: MemberWhereInput, orderBy?: MemberOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Member[]>
+  books: (args: { where?: BookWhereInput, orderBy?: BookOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Book[]>
+  links: (args: { where?: LinkWhereInput, orderBy?: LinkOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Link[]>
   users: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<User[]>
-  paragraph: (args: { where: ParagraphWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph | null>
+  note: (args: { where: NoteWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Note | null>
   tag: (args: { where: TagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Tag | null>
+  member: (args: { where: MemberWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Member | null>
+  book: (args: { where: BookWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Book | null>
+  link: (args: { where: LinkWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Link | null>
   user: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
-  paragraphsConnection: (args: { where?: ParagraphWhereInput, orderBy?: ParagraphOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<ParagraphConnection>
+  notesConnection: (args: { where?: NoteWhereInput, orderBy?: NoteOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<NoteConnection>
   tagsConnection: (args: { where?: TagWhereInput, orderBy?: TagOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<TagConnection>
+  membersConnection: (args: { where?: MemberWhereInput, orderBy?: MemberOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<MemberConnection>
+  booksConnection: (args: { where?: BookWhereInput, orderBy?: BookOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<BookConnection>
+  linksConnection: (args: { where?: LinkWhereInput, orderBy?: LinkOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<LinkConnection>
   usersConnection: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<UserConnection>
   node: (args: { id: ID_Output }, info?: GraphQLResolveInfo | string) => Promise<Node | null>
 }
 
 export type Mutation = {
-  createParagraph: (args: { data: ParagraphCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph>
+  createNote: (args: { data: NoteCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Note>
   createTag: (args: { data: TagCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Tag>
+  createMember: (args: { data: MemberCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Member>
+  createBook: (args: { data: BookCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Book>
+  createLink: (args: { data: LinkCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Link>
   createUser: (args: { data: UserCreateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
-  updateParagraph: (args: { data: ParagraphUpdateInput, where: ParagraphWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph | null>
+  updateNote: (args: { data: NoteUpdateInput, where: NoteWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Note | null>
   updateTag: (args: { data: TagUpdateInput, where: TagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Tag | null>
+  updateMember: (args: { data: MemberUpdateInput, where: MemberWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Member | null>
+  updateBook: (args: { data: BookUpdateInput, where: BookWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Book | null>
+  updateLink: (args: { data: LinkUpdateInput, where: LinkWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Link | null>
   updateUser: (args: { data: UserUpdateInput, where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
-  deleteParagraph: (args: { where: ParagraphWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph | null>
+  deleteNote: (args: { where: NoteWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Note | null>
   deleteTag: (args: { where: TagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Tag | null>
+  deleteMember: (args: { where: MemberWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Member | null>
+  deleteBook: (args: { where: BookWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Book | null>
+  deleteLink: (args: { where: LinkWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Link | null>
   deleteUser: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
-  upsertParagraph: (args: { where: ParagraphWhereUniqueInput, create: ParagraphCreateInput, update: ParagraphUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Paragraph>
+  upsertNote: (args: { where: NoteWhereUniqueInput, create: NoteCreateInput, update: NoteUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Note>
   upsertTag: (args: { where: TagWhereUniqueInput, create: TagCreateInput, update: TagUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Tag>
+  upsertMember: (args: { where: MemberWhereUniqueInput, create: MemberCreateInput, update: MemberUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Member>
+  upsertBook: (args: { where: BookWhereUniqueInput, create: BookCreateInput, update: BookUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Book>
+  upsertLink: (args: { where: LinkWhereUniqueInput, create: LinkCreateInput, update: LinkUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Link>
   upsertUser: (args: { where: UserWhereUniqueInput, create: UserCreateInput, update: UserUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
-  updateManyParagraphs: (args: { data: ParagraphUpdateInput, where: ParagraphWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  updateManyNotes: (args: { data: NoteUpdateInput, where: NoteWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyTags: (args: { data: TagUpdateInput, where: TagWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  updateManyMembers: (args: { data: MemberUpdateInput, where: MemberWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  updateManyBooks: (args: { data: BookUpdateInput, where: BookWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  updateManyLinks: (args: { data: LinkUpdateInput, where: LinkWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyUsers: (args: { data: UserUpdateInput, where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
-  deleteManyParagraphs: (args: { where: ParagraphWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  deleteManyNotes: (args: { where: NoteWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyTags: (args: { where: TagWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  deleteManyMembers: (args: { where: MemberWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  deleteManyBooks: (args: { where: BookWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  deleteManyLinks: (args: { where: LinkWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyUsers: (args: { where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
 }
 
 export type Subscription = {
-  paragraph: (args: { where?: ParagraphSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<ParagraphSubscriptionPayload>>
+  note: (args: { where?: NoteSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<NoteSubscriptionPayload>>
   tag: (args: { where?: TagSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<TagSubscriptionPayload>>
+  member: (args: { where?: MemberSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<MemberSubscriptionPayload>>
+  book: (args: { where?: BookSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<BookSubscriptionPayload>>
+  link: (args: { where?: LinkSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<LinkSubscriptionPayload>>
   user: (args: { where?: UserSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<UserSubscriptionPayload>>
 }
 
@@ -1340,48 +2714,81 @@ export class Prisma extends BasePrisma {
   }
 
   exists = {
-    Paragraph: (where: ParagraphWhereInput): Promise<boolean> => super.existsDelegate('query', 'paragraphs', { where }, {}, '{ id }'),
+    Note: (where: NoteWhereInput): Promise<boolean> => super.existsDelegate('query', 'notes', { where }, {}, '{ id }'),
     Tag: (where: TagWhereInput): Promise<boolean> => super.existsDelegate('query', 'tags', { where }, {}, '{ id }'),
+    Member: (where: MemberWhereInput): Promise<boolean> => super.existsDelegate('query', 'members', { where }, {}, '{ id }'),
+    Book: (where: BookWhereInput): Promise<boolean> => super.existsDelegate('query', 'books', { where }, {}, '{ id }'),
+    Link: (where: LinkWhereInput): Promise<boolean> => super.existsDelegate('query', 'links', { where }, {}, '{ id }'),
     User: (where: UserWhereInput): Promise<boolean> => super.existsDelegate('query', 'users', { where }, {}, '{ id }')
   }
 
   query: Query = {
-    paragraphs: (args, info): Promise<Paragraph[]> => super.delegate('query', 'paragraphs', args, {}, info),
+    notes: (args, info): Promise<Note[]> => super.delegate('query', 'notes', args, {}, info),
     tags: (args, info): Promise<Tag[]> => super.delegate('query', 'tags', args, {}, info),
+    members: (args, info): Promise<Member[]> => super.delegate('query', 'members', args, {}, info),
+    books: (args, info): Promise<Book[]> => super.delegate('query', 'books', args, {}, info),
+    links: (args, info): Promise<Link[]> => super.delegate('query', 'links', args, {}, info),
     users: (args, info): Promise<User[]> => super.delegate('query', 'users', args, {}, info),
-    paragraph: (args, info): Promise<Paragraph | null> => super.delegate('query', 'paragraph', args, {}, info),
+    note: (args, info): Promise<Note | null> => super.delegate('query', 'note', args, {}, info),
     tag: (args, info): Promise<Tag | null> => super.delegate('query', 'tag', args, {}, info),
+    member: (args, info): Promise<Member | null> => super.delegate('query', 'member', args, {}, info),
+    book: (args, info): Promise<Book | null> => super.delegate('query', 'book', args, {}, info),
+    link: (args, info): Promise<Link | null> => super.delegate('query', 'link', args, {}, info),
     user: (args, info): Promise<User | null> => super.delegate('query', 'user', args, {}, info),
-    paragraphsConnection: (args, info): Promise<ParagraphConnection> => super.delegate('query', 'paragraphsConnection', args, {}, info),
+    notesConnection: (args, info): Promise<NoteConnection> => super.delegate('query', 'notesConnection', args, {}, info),
     tagsConnection: (args, info): Promise<TagConnection> => super.delegate('query', 'tagsConnection', args, {}, info),
+    membersConnection: (args, info): Promise<MemberConnection> => super.delegate('query', 'membersConnection', args, {}, info),
+    booksConnection: (args, info): Promise<BookConnection> => super.delegate('query', 'booksConnection', args, {}, info),
+    linksConnection: (args, info): Promise<LinkConnection> => super.delegate('query', 'linksConnection', args, {}, info),
     usersConnection: (args, info): Promise<UserConnection> => super.delegate('query', 'usersConnection', args, {}, info),
     node: (args, info): Promise<Node | null> => super.delegate('query', 'node', args, {}, info)
   }
 
   mutation: Mutation = {
-    createParagraph: (args, info): Promise<Paragraph> => super.delegate('mutation', 'createParagraph', args, {}, info),
+    createNote: (args, info): Promise<Note> => super.delegate('mutation', 'createNote', args, {}, info),
     createTag: (args, info): Promise<Tag> => super.delegate('mutation', 'createTag', args, {}, info),
+    createMember: (args, info): Promise<Member> => super.delegate('mutation', 'createMember', args, {}, info),
+    createBook: (args, info): Promise<Book> => super.delegate('mutation', 'createBook', args, {}, info),
+    createLink: (args, info): Promise<Link> => super.delegate('mutation', 'createLink', args, {}, info),
     createUser: (args, info): Promise<User> => super.delegate('mutation', 'createUser', args, {}, info),
-    updateParagraph: (args, info): Promise<Paragraph | null> => super.delegate('mutation', 'updateParagraph', args, {}, info),
+    updateNote: (args, info): Promise<Note | null> => super.delegate('mutation', 'updateNote', args, {}, info),
     updateTag: (args, info): Promise<Tag | null> => super.delegate('mutation', 'updateTag', args, {}, info),
+    updateMember: (args, info): Promise<Member | null> => super.delegate('mutation', 'updateMember', args, {}, info),
+    updateBook: (args, info): Promise<Book | null> => super.delegate('mutation', 'updateBook', args, {}, info),
+    updateLink: (args, info): Promise<Link | null> => super.delegate('mutation', 'updateLink', args, {}, info),
     updateUser: (args, info): Promise<User | null> => super.delegate('mutation', 'updateUser', args, {}, info),
-    deleteParagraph: (args, info): Promise<Paragraph | null> => super.delegate('mutation', 'deleteParagraph', args, {}, info),
+    deleteNote: (args, info): Promise<Note | null> => super.delegate('mutation', 'deleteNote', args, {}, info),
     deleteTag: (args, info): Promise<Tag | null> => super.delegate('mutation', 'deleteTag', args, {}, info),
+    deleteMember: (args, info): Promise<Member | null> => super.delegate('mutation', 'deleteMember', args, {}, info),
+    deleteBook: (args, info): Promise<Book | null> => super.delegate('mutation', 'deleteBook', args, {}, info),
+    deleteLink: (args, info): Promise<Link | null> => super.delegate('mutation', 'deleteLink', args, {}, info),
     deleteUser: (args, info): Promise<User | null> => super.delegate('mutation', 'deleteUser', args, {}, info),
-    upsertParagraph: (args, info): Promise<Paragraph> => super.delegate('mutation', 'upsertParagraph', args, {}, info),
+    upsertNote: (args, info): Promise<Note> => super.delegate('mutation', 'upsertNote', args, {}, info),
     upsertTag: (args, info): Promise<Tag> => super.delegate('mutation', 'upsertTag', args, {}, info),
+    upsertMember: (args, info): Promise<Member> => super.delegate('mutation', 'upsertMember', args, {}, info),
+    upsertBook: (args, info): Promise<Book> => super.delegate('mutation', 'upsertBook', args, {}, info),
+    upsertLink: (args, info): Promise<Link> => super.delegate('mutation', 'upsertLink', args, {}, info),
     upsertUser: (args, info): Promise<User> => super.delegate('mutation', 'upsertUser', args, {}, info),
-    updateManyParagraphs: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyParagraphs', args, {}, info),
+    updateManyNotes: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyNotes', args, {}, info),
     updateManyTags: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyTags', args, {}, info),
+    updateManyMembers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyMembers', args, {}, info),
+    updateManyBooks: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyBooks', args, {}, info),
+    updateManyLinks: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyLinks', args, {}, info),
     updateManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyUsers', args, {}, info),
-    deleteManyParagraphs: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyParagraphs', args, {}, info),
+    deleteManyNotes: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyNotes', args, {}, info),
     deleteManyTags: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyTags', args, {}, info),
+    deleteManyMembers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyMembers', args, {}, info),
+    deleteManyBooks: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyBooks', args, {}, info),
+    deleteManyLinks: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyLinks', args, {}, info),
     deleteManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyUsers', args, {}, info)
   }
 
   subscription: Subscription = {
-    paragraph: (args, infoOrQuery): Promise<AsyncIterator<ParagraphSubscriptionPayload>> => super.delegateSubscription('paragraph', args, {}, infoOrQuery),
+    note: (args, infoOrQuery): Promise<AsyncIterator<NoteSubscriptionPayload>> => super.delegateSubscription('note', args, {}, infoOrQuery),
     tag: (args, infoOrQuery): Promise<AsyncIterator<TagSubscriptionPayload>> => super.delegateSubscription('tag', args, {}, infoOrQuery),
+    member: (args, infoOrQuery): Promise<AsyncIterator<MemberSubscriptionPayload>> => super.delegateSubscription('member', args, {}, infoOrQuery),
+    book: (args, infoOrQuery): Promise<AsyncIterator<BookSubscriptionPayload>> => super.delegateSubscription('book', args, {}, infoOrQuery),
+    link: (args, infoOrQuery): Promise<AsyncIterator<LinkSubscriptionPayload>> => super.delegateSubscription('link', args, {}, infoOrQuery),
     user: (args, infoOrQuery): Promise<AsyncIterator<UserSubscriptionPayload>> => super.delegateSubscription('user', args, {}, infoOrQuery)
   }
 }
