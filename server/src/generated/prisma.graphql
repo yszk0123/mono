@@ -9,9 +9,17 @@ type Paragraph implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  isPublished: Boolean!
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
   title: String!
   text: String!
+  story(where: ParagraphWhereInput): Paragraph
+  author(where: UserWhereInput): User!
+}
+
+type Tag implements Node {
+  id: ID!
+  text: String!
+  category(where: TagWhereInput): Tag
   author(where: UserWhereInput): User!
 }
 
@@ -32,6 +40,10 @@ type AggregateParagraph {
   count: Int!
 }
 
+type AggregateTag {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -46,16 +58,22 @@ scalar Long
 
 type Mutation {
   createParagraph(data: ParagraphCreateInput!): Paragraph!
+  createTag(data: TagCreateInput!): Tag!
   createUser(data: UserCreateInput!): User!
   updateParagraph(data: ParagraphUpdateInput!, where: ParagraphWhereUniqueInput!): Paragraph
+  updateTag(data: TagUpdateInput!, where: TagWhereUniqueInput!): Tag
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteParagraph(where: ParagraphWhereUniqueInput!): Paragraph
+  deleteTag(where: TagWhereUniqueInput!): Tag
   deleteUser(where: UserWhereUniqueInput!): User
   upsertParagraph(where: ParagraphWhereUniqueInput!, create: ParagraphCreateInput!, update: ParagraphUpdateInput!): Paragraph!
+  upsertTag(where: TagWhereUniqueInput!, create: TagCreateInput!, update: TagUpdateInput!): Tag!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyParagraphs(data: ParagraphUpdateInput!, where: ParagraphWhereInput!): BatchPayload!
+  updateManyTags(data: TagUpdateInput!, where: TagWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   deleteManyParagraphs(where: ParagraphWhereInput!): BatchPayload!
+  deleteManyTags(where: TagWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
 }
 
@@ -83,9 +101,10 @@ type ParagraphConnection {
 }
 
 input ParagraphCreateInput {
-  isPublished: Boolean
   title: String!
   text: String!
+  tags: TagCreateManyInput
+  story: ParagraphCreateOneWithoutStoryInput
   author: UserCreateOneWithoutParagraphsInput!
 }
 
@@ -94,10 +113,23 @@ input ParagraphCreateManyWithoutAuthorInput {
   connect: [ParagraphWhereUniqueInput!]
 }
 
+input ParagraphCreateOneWithoutStoryInput {
+  create: ParagraphCreateWithoutStoryInput
+  connect: ParagraphWhereUniqueInput
+}
+
 input ParagraphCreateWithoutAuthorInput {
-  isPublished: Boolean
   title: String!
   text: String!
+  tags: TagCreateManyInput
+  story: ParagraphCreateOneWithoutStoryInput
+}
+
+input ParagraphCreateWithoutStoryInput {
+  title: String!
+  text: String!
+  tags: TagCreateManyInput
+  author: UserCreateOneWithoutParagraphsInput!
 }
 
 type ParagraphEdge {
@@ -112,8 +144,6 @@ enum ParagraphOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  isPublished_ASC
-  isPublished_DESC
   title_ASC
   title_DESC
   text_ASC
@@ -124,7 +154,6 @@ type ParagraphPreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  isPublished: Boolean!
   title: String!
   text: String!
 }
@@ -147,9 +176,10 @@ input ParagraphSubscriptionWhereInput {
 }
 
 input ParagraphUpdateInput {
-  isPublished: Boolean
   title: String
   text: String
+  tags: TagUpdateManyInput
+  story: ParagraphUpdateOneWithoutStoryInput
   author: UserUpdateOneWithoutParagraphsInput
 }
 
@@ -162,10 +192,20 @@ input ParagraphUpdateManyWithoutAuthorInput {
   upsert: [ParagraphUpsertWithoutAuthorInput!]
 }
 
+input ParagraphUpdateOneWithoutStoryInput {
+  create: ParagraphCreateWithoutStoryInput
+  connect: ParagraphWhereUniqueInput
+  disconnect: ParagraphWhereUniqueInput
+  delete: ParagraphWhereUniqueInput
+  update: ParagraphUpdateWithoutStoryInput
+  upsert: ParagraphUpsertWithoutStoryInput
+}
+
 input ParagraphUpdateWithoutAuthorDataInput {
-  isPublished: Boolean
   title: String
   text: String
+  tags: TagUpdateManyInput
+  story: ParagraphUpdateOneWithoutStoryInput
 }
 
 input ParagraphUpdateWithoutAuthorInput {
@@ -173,10 +213,28 @@ input ParagraphUpdateWithoutAuthorInput {
   data: ParagraphUpdateWithoutAuthorDataInput!
 }
 
+input ParagraphUpdateWithoutStoryDataInput {
+  title: String
+  text: String
+  tags: TagUpdateManyInput
+  author: UserUpdateOneWithoutParagraphsInput
+}
+
+input ParagraphUpdateWithoutStoryInput {
+  where: ParagraphWhereUniqueInput!
+  data: ParagraphUpdateWithoutStoryDataInput!
+}
+
 input ParagraphUpsertWithoutAuthorInput {
   where: ParagraphWhereUniqueInput!
   update: ParagraphUpdateWithoutAuthorDataInput!
   create: ParagraphCreateWithoutAuthorInput!
+}
+
+input ParagraphUpsertWithoutStoryInput {
+  where: ParagraphWhereUniqueInput!
+  update: ParagraphUpdateWithoutStoryDataInput!
+  create: ParagraphCreateWithoutStoryInput!
 }
 
 input ParagraphWhereInput {
@@ -212,8 +270,6 @@ input ParagraphWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
-  isPublished: Boolean
-  isPublished_not: Boolean
   title: String
   title_not: String
   title_in: [String!]
@@ -242,6 +298,10 @@ input ParagraphWhereInput {
   text_not_starts_with: String
   text_ends_with: String
   text_not_ends_with: String
+  tags_every: TagWhereInput
+  tags_some: TagWhereInput
+  tags_none: TagWhereInput
+  story: ParagraphWhereInput
   author: UserWhereInput
 }
 
@@ -251,17 +311,163 @@ input ParagraphWhereUniqueInput {
 
 type Query {
   paragraphs(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Paragraph]!
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   paragraph(where: ParagraphWhereUniqueInput!): Paragraph
+  tag(where: TagWhereUniqueInput!): Tag
   user(where: UserWhereUniqueInput!): User
   paragraphsConnection(where: ParagraphWhereInput, orderBy: ParagraphOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ParagraphConnection!
+  tagsConnection(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TagConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
 }
 
 type Subscription {
   paragraph(where: ParagraphSubscriptionWhereInput): ParagraphSubscriptionPayload
+  tag(where: TagSubscriptionWhereInput): TagSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+}
+
+type TagConnection {
+  pageInfo: PageInfo!
+  edges: [TagEdge]!
+  aggregate: AggregateTag!
+}
+
+input TagCreateInput {
+  text: String!
+  category: TagCreateOneWithoutCategoryInput
+  author: UserCreateOneInput!
+}
+
+input TagCreateManyInput {
+  create: [TagCreateInput!]
+  connect: [TagWhereUniqueInput!]
+}
+
+input TagCreateOneWithoutCategoryInput {
+  create: TagCreateWithoutCategoryInput
+  connect: TagWhereUniqueInput
+}
+
+input TagCreateWithoutCategoryInput {
+  text: String!
+  author: UserCreateOneInput!
+}
+
+type TagEdge {
+  node: Tag!
+  cursor: String!
+}
+
+enum TagOrderByInput {
+  id_ASC
+  id_DESC
+  text_ASC
+  text_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type TagPreviousValues {
+  id: ID!
+  text: String!
+}
+
+type TagSubscriptionPayload {
+  mutation: MutationType!
+  node: Tag
+  updatedFields: [String!]
+  previousValues: TagPreviousValues
+}
+
+input TagSubscriptionWhereInput {
+  AND: [TagSubscriptionWhereInput!]
+  OR: [TagSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TagWhereInput
+}
+
+input TagUpdateInput {
+  text: String
+  category: TagUpdateOneWithoutCategoryInput
+  author: UserUpdateOneInput
+}
+
+input TagUpdateManyInput {
+  create: [TagCreateInput!]
+  connect: [TagWhereUniqueInput!]
+  disconnect: [TagWhereUniqueInput!]
+  delete: [TagWhereUniqueInput!]
+}
+
+input TagUpdateOneWithoutCategoryInput {
+  create: TagCreateWithoutCategoryInput
+  connect: TagWhereUniqueInput
+  disconnect: TagWhereUniqueInput
+  delete: TagWhereUniqueInput
+  update: TagUpdateWithoutCategoryInput
+  upsert: TagUpsertWithoutCategoryInput
+}
+
+input TagUpdateWithoutCategoryDataInput {
+  text: String
+  author: UserUpdateOneInput
+}
+
+input TagUpdateWithoutCategoryInput {
+  where: TagWhereUniqueInput!
+  data: TagUpdateWithoutCategoryDataInput!
+}
+
+input TagUpsertWithoutCategoryInput {
+  where: TagWhereUniqueInput!
+  update: TagUpdateWithoutCategoryDataInput!
+  create: TagCreateWithoutCategoryInput!
+}
+
+input TagWhereInput {
+  AND: [TagWhereInput!]
+  OR: [TagWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  text: String
+  text_not: String
+  text_in: [String!]
+  text_not_in: [String!]
+  text_lt: String
+  text_lte: String
+  text_gt: String
+  text_gte: String
+  text_contains: String
+  text_not_contains: String
+  text_starts_with: String
+  text_not_starts_with: String
+  text_ends_with: String
+  text_not_ends_with: String
+  category: TagWhereInput
+  author: UserWhereInput
+}
+
+input TagWhereUniqueInput {
+  id: ID
 }
 
 type UserConnection {
@@ -275,6 +481,11 @@ input UserCreateInput {
   password: String!
   name: String!
   paragraphs: ParagraphCreateManyWithoutAuthorInput
+}
+
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutParagraphsInput {
@@ -337,6 +548,13 @@ input UserUpdateInput {
   password: String
   name: String
   paragraphs: ParagraphUpdateManyWithoutAuthorInput
+}
+
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
 }
 
 input UserUpdateOneWithoutParagraphsInput {

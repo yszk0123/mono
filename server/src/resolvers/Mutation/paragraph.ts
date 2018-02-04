@@ -8,7 +8,6 @@ export const paragraph = {
         data: {
           title,
           text,
-          isPublished: false,
           author: {
             connect: { id: userId },
           },

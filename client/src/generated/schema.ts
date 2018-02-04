@@ -6,6 +6,9 @@ export interface FeedQuery {
     id: string,
     text: string,
     title: string,
-    isPublished: boolean,
+    tags:  Array< {
+      id: string,
+      text: string,
+    } > | null,
   } >,
 };

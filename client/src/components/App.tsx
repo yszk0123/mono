@@ -31,7 +31,10 @@ const FEED_QUERY = gql`
       id
       text
       title
-      isPublished
+      tags {
+        id
+        text
+      }
     }
   }
 `;

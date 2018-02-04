@@ -2,9 +2,17 @@ type Paragraph {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
-  isPublished: Boolean! @default(value: "false")
+  tags: [Tag!]! @default(value: [])
   title: String!
   text: String!
+  story: Paragraph
+  author: User!
+}
+
+type Tag {
+  id: ID! @unique
+  text: String!
+  category: Tag
   author: User!
 }
 
