@@ -17,9 +17,7 @@ class App extends React.Component<DataProps<FeedQuery>> {
       <div>
         <h1>Hello</h1>
         {feed &&
-          feed.map(paragraph => (
-            <div key={paragraph.id}>{paragraph.title}</div>
-          ))}
+          feed.map(paragraph => <div key={paragraph.id}>{paragraph.text}</div>)}
       </div>
     );
   }
@@ -30,7 +28,6 @@ const FEED_QUERY = gql`
     feed {
       id
       text
-      title
       tags {
         id
         text

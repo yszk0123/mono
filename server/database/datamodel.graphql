@@ -1,12 +1,20 @@
 type Paragraph {
   id: ID! @unique
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  tags: [Tag!]! @default(value: [])
-  title: String!
   text: String!
+  status: Status! @default(value: TEXT)
+  level: Int! @default(value: 0)
+  tags: [Tag!]! @default(value: [])
   story: Paragraph
   author: User!
+  createdAt: DateTime!
+}
+
+enum Status {
+  TEXT
+  ORDERED
+  UNORDERED
+  CHECKED
+  UNCHECKED
 }
 
 type Tag {

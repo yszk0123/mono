@@ -11,13 +11,13 @@ const typeDefs = `
 
 type Paragraph implements Node {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
-  title: String!
   text: String!
+  status: Status!
+  level: Int!
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
   story(where: ParagraphWhereInput): Paragraph
   author(where: UserWhereInput): User!
+  createdAt: DateTime!
 }
 
 type Tag implements Node {
@@ -105,8 +105,9 @@ type ParagraphConnection {
 }
 
 input ParagraphCreateInput {
-  title: String!
   text: String!
+  status: Status
+  level: Int
   tags: TagCreateManyInput
   story: ParagraphCreateOneWithoutStoryInput
   author: UserCreateOneWithoutParagraphsInput!
@@ -123,15 +124,17 @@ input ParagraphCreateOneWithoutStoryInput {
 }
 
 input ParagraphCreateWithoutAuthorInput {
-  title: String!
   text: String!
+  status: Status
+  level: Int
   tags: TagCreateManyInput
   story: ParagraphCreateOneWithoutStoryInput
 }
 
 input ParagraphCreateWithoutStoryInput {
-  title: String!
   text: String!
+  status: Status
+  level: Int
   tags: TagCreateManyInput
   author: UserCreateOneWithoutParagraphsInput!
 }
@@ -144,22 +147,24 @@ type ParagraphEdge {
 enum ParagraphOrderByInput {
   id_ASC
   id_DESC
+  text_ASC
+  text_DESC
+  status_ASC
+  status_DESC
+  level_ASC
+  level_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  title_ASC
-  title_DESC
-  text_ASC
-  text_DESC
 }
 
 type ParagraphPreviousValues {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  title: String!
   text: String!
+  status: Status!
+  level: Int!
+  createdAt: DateTime!
 }
 
 type ParagraphSubscriptionPayload {
@@ -180,8 +185,9 @@ input ParagraphSubscriptionWhereInput {
 }
 
 input ParagraphUpdateInput {
-  title: String
   text: String
+  status: Status
+  level: Int
   tags: TagUpdateManyInput
   story: ParagraphUpdateOneWithoutStoryInput
   author: UserUpdateOneWithoutParagraphsInput
@@ -206,8 +212,9 @@ input ParagraphUpdateOneWithoutStoryInput {
 }
 
 input ParagraphUpdateWithoutAuthorDataInput {
-  title: String
   text: String
+  status: Status
+  level: Int
   tags: TagUpdateManyInput
   story: ParagraphUpdateOneWithoutStoryInput
 }
@@ -218,8 +225,9 @@ input ParagraphUpdateWithoutAuthorInput {
 }
 
 input ParagraphUpdateWithoutStoryDataInput {
-  title: String
   text: String
+  status: Status
+  level: Int
   tags: TagUpdateManyInput
   author: UserUpdateOneWithoutParagraphsInput
 }
@@ -258,36 +266,6 @@ input ParagraphWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  createdAt: DateTime
-  createdAt_not: DateTime
-  createdAt_in: [DateTime!]
-  createdAt_not_in: [DateTime!]
-  createdAt_lt: DateTime
-  createdAt_lte: DateTime
-  createdAt_gt: DateTime
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  updatedAt_not: DateTime
-  updatedAt_in: [DateTime!]
-  updatedAt_not_in: [DateTime!]
-  updatedAt_lt: DateTime
-  updatedAt_lte: DateTime
-  updatedAt_gt: DateTime
-  updatedAt_gte: DateTime
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
   text: String
   text_not: String
   text_in: [String!]
@@ -302,6 +280,26 @@ input ParagraphWhereInput {
   text_not_starts_with: String
   text_ends_with: String
   text_not_ends_with: String
+  status: Status
+  status_not: Status
+  status_in: [Status!]
+  status_not_in: [Status!]
+  level: Int
+  level_not: Int
+  level_in: [Int!]
+  level_not_in: [Int!]
+  level_lt: Int
+  level_lte: Int
+  level_gt: Int
+  level_gte: Int
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
   tags_every: TagWhereInput
   tags_some: TagWhereInput
   tags_none: TagWhereInput
@@ -324,6 +322,14 @@ type Query {
   tagsConnection(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TagConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
+}
+
+enum Status {
+  TEXT
+  ORDERED
+  UNORDERED
+  CHECKED
+  UNCHECKED
 }
 
 type Subscription {
@@ -660,14 +666,16 @@ input UserWhereUniqueInput {
 export type ParagraphOrderByInput = 
   'id_ASC' |
   'id_DESC' |
+  'text_ASC' |
+  'text_DESC' |
+  'status_ASC' |
+  'status_DESC' |
+  'level_ASC' |
+  'level_DESC' |
   'createdAt_ASC' |
   'createdAt_DESC' |
   'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'title_ASC' |
-  'title_DESC' |
-  'text_ASC' |
-  'text_DESC'
+  'updatedAt_DESC'
 
 export type TagOrderByInput = 
   'id_ASC' |
@@ -693,14 +701,24 @@ export type UserOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
+export type Status = 
+  'TEXT' |
+  'ORDERED' |
+  'UNORDERED' |
+  'CHECKED' |
+  'UNCHECKED'
+
 export type MutationType = 
   'CREATED' |
   'UPDATED' |
   'DELETED'
 
-export interface ParagraphCreateOneWithoutStoryInput {
-  create?: ParagraphCreateWithoutStoryInput
-  connect?: ParagraphWhereUniqueInput
+export interface ParagraphCreateWithoutAuthorInput {
+  text: String
+  status?: Status
+  level?: Int
+  tags?: TagCreateManyInput
+  story?: ParagraphCreateOneWithoutStoryInput
 }
 
 export interface ParagraphWhereInput {
@@ -720,36 +738,6 @@ export interface ParagraphWhereInput {
   id_not_starts_with?: ID_Input
   id_ends_with?: ID_Input
   id_not_ends_with?: ID_Input
-  createdAt?: DateTime
-  createdAt_not?: DateTime
-  createdAt_in?: DateTime[] | DateTime
-  createdAt_not_in?: DateTime[] | DateTime
-  createdAt_lt?: DateTime
-  createdAt_lte?: DateTime
-  createdAt_gt?: DateTime
-  createdAt_gte?: DateTime
-  updatedAt?: DateTime
-  updatedAt_not?: DateTime
-  updatedAt_in?: DateTime[] | DateTime
-  updatedAt_not_in?: DateTime[] | DateTime
-  updatedAt_lt?: DateTime
-  updatedAt_lte?: DateTime
-  updatedAt_gt?: DateTime
-  updatedAt_gte?: DateTime
-  title?: String
-  title_not?: String
-  title_in?: String[] | String
-  title_not_in?: String[] | String
-  title_lt?: String
-  title_lte?: String
-  title_gt?: String
-  title_gte?: String
-  title_contains?: String
-  title_not_contains?: String
-  title_starts_with?: String
-  title_not_starts_with?: String
-  title_ends_with?: String
-  title_not_ends_with?: String
   text?: String
   text_not?: String
   text_in?: String[] | String
@@ -764,6 +752,26 @@ export interface ParagraphWhereInput {
   text_not_starts_with?: String
   text_ends_with?: String
   text_not_ends_with?: String
+  status?: Status
+  status_not?: Status
+  status_in?: Status[] | Status
+  status_not_in?: Status[] | Status
+  level?: Int
+  level_not?: Int
+  level_in?: Int[] | Int
+  level_not_in?: Int[] | Int
+  level_lt?: Int
+  level_lte?: Int
+  level_gt?: Int
+  level_gte?: Int
+  createdAt?: DateTime
+  createdAt_not?: DateTime
+  createdAt_in?: DateTime[] | DateTime
+  createdAt_not_in?: DateTime[] | DateTime
+  createdAt_lt?: DateTime
+  createdAt_lte?: DateTime
+  createdAt_gt?: DateTime
+  createdAt_gte?: DateTime
   tags_every?: TagWhereInput
   tags_some?: TagWhereInput
   tags_none?: TagWhereInput
@@ -859,8 +867,9 @@ export interface TagCreateInput {
 }
 
 export interface ParagraphUpdateInput {
-  title?: String
   text?: String
+  status?: Status
+  level?: Int
   tags?: TagUpdateManyInput
   story?: ParagraphUpdateOneWithoutStoryInput
   author?: UserUpdateOneWithoutParagraphsInput
@@ -871,14 +880,14 @@ export interface TagCreateOneWithoutCategoryInput {
   connect?: TagWhereUniqueInput
 }
 
-export interface UserSubscriptionWhereInput {
-  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
-  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+export interface TagSubscriptionWhereInput {
+  AND?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
+  OR?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
   mutation_in?: MutationType[] | MutationType
   updatedFields_contains?: String
   updatedFields_contains_every?: String[] | String
   updatedFields_contains_some?: String[] | String
-  node?: UserWhereInput
+  node?: TagWhereInput
 }
 
 export interface TagCreateWithoutCategoryInput {
@@ -886,14 +895,10 @@ export interface TagCreateWithoutCategoryInput {
   author: UserCreateOneInput
 }
 
-export interface ParagraphSubscriptionWhereInput {
-  AND?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
-  OR?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: ParagraphWhereInput
+export interface ParagraphUpsertWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput
+  update: ParagraphUpdateWithoutAuthorDataInput
+  create: ParagraphCreateWithoutAuthorInput
 }
 
 export interface UserCreateOneInput {
@@ -912,10 +917,12 @@ export interface UserCreateInput {
   paragraphs?: ParagraphCreateManyWithoutAuthorInput
 }
 
-export interface ParagraphUpsertWithoutAuthorInput {
-  where: ParagraphWhereUniqueInput
-  update: ParagraphUpdateWithoutAuthorDataInput
-  create: ParagraphCreateWithoutAuthorInput
+export interface ParagraphUpdateWithoutAuthorDataInput {
+  text?: String
+  status?: Status
+  level?: Int
+  tags?: TagUpdateManyInput
+  story?: ParagraphUpdateOneWithoutStoryInput
 }
 
 export interface ParagraphCreateManyWithoutAuthorInput {
@@ -923,48 +930,52 @@ export interface ParagraphCreateManyWithoutAuthorInput {
   connect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
 }
 
-export interface ParagraphUpdateWithoutAuthorInput {
-  where: ParagraphWhereUniqueInput
-  data: ParagraphUpdateWithoutAuthorDataInput
+export interface ParagraphUpdateManyWithoutAuthorInput {
+  create?: ParagraphCreateWithoutAuthorInput[] | ParagraphCreateWithoutAuthorInput
+  connect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
+  disconnect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
+  delete?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
+  update?: ParagraphUpdateWithoutAuthorInput[] | ParagraphUpdateWithoutAuthorInput
+  upsert?: ParagraphUpsertWithoutAuthorInput[] | ParagraphUpsertWithoutAuthorInput
 }
 
-export interface ParagraphCreateWithoutAuthorInput {
-  title: String
-  text: String
-  tags?: TagCreateManyInput
-  story?: ParagraphCreateOneWithoutStoryInput
+export interface UserUpsertWithoutParagraphsInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutParagraphsDataInput
+  create: UserCreateWithoutParagraphsInput
 }
 
-export interface UserUpdateInput {
-  email?: String
-  password?: String
-  name?: String
-  paragraphs?: ParagraphUpdateManyWithoutAuthorInput
+export interface TagUpsertWithoutCategoryInput {
+  where: TagWhereUniqueInput
+  update: TagUpdateWithoutCategoryDataInput
+  create: TagCreateWithoutCategoryInput
 }
 
-export interface ParagraphUpsertWithoutStoryInput {
-  where: ParagraphWhereUniqueInput
-  update: ParagraphUpdateWithoutStoryDataInput
-  create: ParagraphCreateWithoutStoryInput
+export interface ParagraphCreateOneWithoutStoryInput {
+  create?: ParagraphCreateWithoutStoryInput
+  connect?: ParagraphWhereUniqueInput
 }
 
-export interface UserUpdateOneInput {
-  create?: UserCreateInput
-  connect?: UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput
-  delete?: UserWhereUniqueInput
+export interface TagUpdateWithoutCategoryDataInput {
+  text?: String
+  author?: UserUpdateOneInput
 }
 
 export interface ParagraphCreateWithoutStoryInput {
-  title: String
   text: String
+  status?: Status
+  level?: Int
   tags?: TagCreateManyInput
   author: UserCreateOneWithoutParagraphsInput
 }
 
-export interface TagUpdateWithoutCategoryInput {
-  where: TagWhereUniqueInput
-  data: TagUpdateWithoutCategoryDataInput
+export interface TagUpdateOneWithoutCategoryInput {
+  create?: TagCreateWithoutCategoryInput
+  connect?: TagWhereUniqueInput
+  disconnect?: TagWhereUniqueInput
+  delete?: TagWhereUniqueInput
+  update?: TagUpdateWithoutCategoryInput
+  upsert?: TagUpsertWithoutCategoryInput
 }
 
 export interface UserCreateOneWithoutParagraphsInput {
@@ -972,16 +983,10 @@ export interface UserCreateOneWithoutParagraphsInput {
   connect?: UserWhereUniqueInput
 }
 
-export interface TagUpdateInput {
-  text?: String
-  category?: TagUpdateOneWithoutCategoryInput
-  author?: UserUpdateOneInput
-}
-
-export interface UserUpsertWithoutParagraphsInput {
-  where: UserWhereUniqueInput
-  update: UserUpdateWithoutParagraphsDataInput
-  create: UserCreateWithoutParagraphsInput
+export interface ParagraphUpsertWithoutStoryInput {
+  where: ParagraphWhereUniqueInput
+  update: ParagraphUpdateWithoutStoryDataInput
+  create: ParagraphCreateWithoutStoryInput
 }
 
 export interface TagWhereInput {
@@ -1019,15 +1024,23 @@ export interface TagWhereInput {
   author?: UserWhereInput
 }
 
+export interface UserSubscriptionWhereInput {
+  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: UserWhereInput
+}
+
 export interface ParagraphWhereUniqueInput {
   id?: ID_Input
 }
 
-export interface ParagraphUpdateWithoutAuthorDataInput {
-  title?: String
-  text?: String
-  tags?: TagUpdateManyInput
-  story?: ParagraphUpdateOneWithoutStoryInput
+export interface ParagraphUpdateWithoutAuthorInput {
+  where: ParagraphWhereUniqueInput
+  data: ParagraphUpdateWithoutAuthorDataInput
 }
 
 export interface TagUpdateManyInput {
@@ -1037,10 +1050,11 @@ export interface TagUpdateManyInput {
   delete?: TagWhereUniqueInput[] | TagWhereUniqueInput
 }
 
-export interface TagUpsertWithoutCategoryInput {
-  where: TagWhereUniqueInput
-  update: TagUpdateWithoutCategoryDataInput
-  create: TagCreateWithoutCategoryInput
+export interface UserUpdateOneInput {
+  create?: UserCreateInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
 }
 
 export interface ParagraphUpdateOneWithoutStoryInput {
@@ -1052,13 +1066,10 @@ export interface ParagraphUpdateOneWithoutStoryInput {
   upsert?: ParagraphUpsertWithoutStoryInput
 }
 
-export interface TagUpdateOneWithoutCategoryInput {
-  create?: TagCreateWithoutCategoryInput
-  connect?: TagWhereUniqueInput
-  disconnect?: TagWhereUniqueInput
-  delete?: TagWhereUniqueInput
-  update?: TagUpdateWithoutCategoryInput
-  upsert?: TagUpsertWithoutCategoryInput
+export interface TagUpdateInput {
+  text?: String
+  category?: TagUpdateOneWithoutCategoryInput
+  author?: UserUpdateOneInput
 }
 
 export interface UserUpdateWithoutParagraphsInput {
@@ -1076,8 +1087,9 @@ export interface UserUpdateOneWithoutParagraphsInput {
 }
 
 export interface ParagraphUpdateWithoutStoryDataInput {
-  title?: String
   text?: String
+  status?: Status
+  level?: Int
   tags?: TagUpdateManyInput
   author?: UserUpdateOneWithoutParagraphsInput
 }
@@ -1088,25 +1100,24 @@ export interface ParagraphUpdateWithoutStoryInput {
 }
 
 export interface ParagraphCreateInput {
-  title: String
   text: String
+  status?: Status
+  level?: Int
   tags?: TagCreateManyInput
   story?: ParagraphCreateOneWithoutStoryInput
   author: UserCreateOneWithoutParagraphsInput
 }
 
-export interface TagUpdateWithoutCategoryDataInput {
-  text?: String
-  author?: UserUpdateOneInput
+export interface TagUpdateWithoutCategoryInput {
+  where: TagWhereUniqueInput
+  data: TagUpdateWithoutCategoryDataInput
 }
 
-export interface ParagraphUpdateManyWithoutAuthorInput {
-  create?: ParagraphCreateWithoutAuthorInput[] | ParagraphCreateWithoutAuthorInput
-  connect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
-  disconnect?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
-  delete?: ParagraphWhereUniqueInput[] | ParagraphWhereUniqueInput
-  update?: ParagraphUpdateWithoutAuthorInput[] | ParagraphUpdateWithoutAuthorInput
-  upsert?: ParagraphUpsertWithoutAuthorInput[] | ParagraphUpsertWithoutAuthorInput
+export interface UserUpdateInput {
+  email?: String
+  password?: String
+  name?: String
+  paragraphs?: ParagraphUpdateManyWithoutAuthorInput
 }
 
 export interface UserWhereUniqueInput {
@@ -1114,14 +1125,14 @@ export interface UserWhereUniqueInput {
   email?: String
 }
 
-export interface TagSubscriptionWhereInput {
-  AND?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
-  OR?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
+export interface ParagraphSubscriptionWhereInput {
+  AND?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
+  OR?: ParagraphSubscriptionWhereInput[] | ParagraphSubscriptionWhereInput
   mutation_in?: MutationType[] | MutationType
   updatedFields_contains?: String
   updatedFields_contains_every?: String[] | String
   updatedFields_contains_some?: String[] | String
-  node?: TagWhereInput
+  node?: ParagraphWhereInput
 }
 
 export interface Node {
@@ -1135,29 +1146,11 @@ export interface UserPreviousValues {
   name: String
 }
 
-export interface ParagraphConnection {
-  pageInfo: PageInfo
-  edges: ParagraphEdge[]
-  aggregate: AggregateParagraph
-}
-
-export interface Paragraph extends Node {
-  id: ID_Output
-  createdAt: DateTime
-  updatedAt: DateTime
-  tags?: Tag[]
-  title: String
-  text: String
-  story?: Paragraph
-  author: User
-}
-
-export interface BatchPayload {
-  count: Long
-}
-
-export interface AggregateUser {
-  count: Int
+export interface PageInfo {
+  hasNextPage: Boolean
+  hasPreviousPage: Boolean
+  startCursor?: String
+  endCursor?: String
 }
 
 export interface Tag extends Node {
@@ -1167,17 +1160,25 @@ export interface Tag extends Node {
   author: User
 }
 
-export interface User extends Node {
-  id: ID_Output
-  email: String
-  password: String
-  name: String
-  paragraphs?: Paragraph[]
+export interface ParagraphConnection {
+  pageInfo: PageInfo
+  edges: ParagraphEdge[]
+  aggregate: AggregateParagraph
 }
 
-export interface UserEdge {
-  node: User
-  cursor: String
+export interface Paragraph extends Node {
+  id: ID_Output
+  text: String
+  status: Status
+  level: Int
+  tags?: Tag[]
+  story?: Paragraph
+  author: User
+  createdAt: DateTime
+}
+
+export interface AggregateUser {
+  count: Int
 }
 
 export interface UserConnection {
@@ -1186,27 +1187,37 @@ export interface UserConnection {
   aggregate: AggregateUser
 }
 
-export interface AggregateTag {
+export interface BatchPayload {
+  count: Long
+}
+
+export interface TagEdge {
+  node: Tag
+  cursor: String
+}
+
+export interface TagPreviousValues {
+  id: ID_Output
+  text: String
+}
+
+export interface AggregateParagraph {
   count: Int
 }
 
-export interface TagConnection {
-  pageInfo: PageInfo
-  edges: TagEdge[]
-  aggregate: AggregateTag
-}
-
-export interface ParagraphEdge {
-  node: Paragraph
-  cursor: String
+export interface UserSubscriptionPayload {
+  mutation: MutationType
+  node?: User
+  updatedFields?: String[]
+  previousValues?: UserPreviousValues
 }
 
 export interface ParagraphPreviousValues {
   id: ID_Output
-  createdAt: DateTime
-  updatedAt: DateTime
-  title: String
   text: String
+  status: Status
+  level: Int
+  createdAt: DateTime
 }
 
 export interface ParagraphSubscriptionPayload {
@@ -1223,45 +1234,38 @@ export interface TagSubscriptionPayload {
   previousValues?: TagPreviousValues
 }
 
-export interface TagPreviousValues {
+export interface User extends Node {
   id: ID_Output
-  text: String
+  email: String
+  password: String
+  name: String
+  paragraphs?: Paragraph[]
 }
 
-export interface UserSubscriptionPayload {
-  mutation: MutationType
-  node?: User
-  updatedFields?: String[]
-  previousValues?: UserPreviousValues
-}
-
-export interface AggregateParagraph {
-  count: Int
-}
-
-export interface TagEdge {
-  node: Tag
+export interface UserEdge {
+  node: User
   cursor: String
 }
 
-export interface PageInfo {
-  hasNextPage: Boolean
-  hasPreviousPage: Boolean
-  startCursor?: String
-  endCursor?: String
+export interface ParagraphEdge {
+  node: Paragraph
+  cursor: String
 }
 
-export type Long = string
+export interface TagConnection {
+  pageInfo: PageInfo
+  edges: TagEdge[]
+  aggregate: AggregateTag
+}
+
+export interface AggregateTag {
+  count: Int
+}
 
 /*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
 */
 export type Int = number
-
-/*
-The `Boolean` scalar type represents `true` or `false`.
-*/
-export type Boolean = boolean
 
 /*
 The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
@@ -1270,11 +1274,18 @@ export type ID_Input = string | number
 export type ID_Output = string
 
 /*
+The `Boolean` scalar type represents `true` or `false`.
+*/
+export type Boolean = boolean
+
+export type DateTime = string
+
+export type Long = string
+
+/*
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
 */
 export type String = string
-
-export type DateTime = string
 
 export interface Schema {
   query: Query

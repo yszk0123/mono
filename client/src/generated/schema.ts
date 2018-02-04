@@ -5,7 +5,6 @@ export interface FeedQuery {
   feed:  Array< {
     id: string,
     text: string,
-    title: string,
     tags:  Array< {
       id: string,
       text: string,

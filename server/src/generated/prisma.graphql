@@ -7,13 +7,13 @@
 
 type Paragraph implements Node {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
-  title: String!
   text: String!
+  status: Status!
+  level: Int!
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
   story(where: ParagraphWhereInput): Paragraph
   author(where: UserWhereInput): User!
+  createdAt: DateTime!
 }
 
 type Tag implements Node {
@@ -101,8 +101,9 @@ type ParagraphConnection {
 }
 
 input ParagraphCreateInput {
-  title: String!
   text: String!
+  status: Status
+  level: Int
   tags: TagCreateManyInput
   story: ParagraphCreateOneWithoutStoryInput
   author: UserCreateOneWithoutParagraphsInput!
@@ -119,15 +120,17 @@ input ParagraphCreateOneWithoutStoryInput {
 }
 
 input ParagraphCreateWithoutAuthorInput {
-  title: String!
   text: String!
+  status: Status
+  level: Int
   tags: TagCreateManyInput
   story: ParagraphCreateOneWithoutStoryInput
 }
 
 input ParagraphCreateWithoutStoryInput {
-  title: String!
   text: String!
+  status: Status
+  level: Int
   tags: TagCreateManyInput
   author: UserCreateOneWithoutParagraphsInput!
 }
@@ -140,22 +143,24 @@ type ParagraphEdge {
 enum ParagraphOrderByInput {
   id_ASC
   id_DESC
+  text_ASC
+  text_DESC
+  status_ASC
+  status_DESC
+  level_ASC
+  level_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  title_ASC
-  title_DESC
-  text_ASC
-  text_DESC
 }
 
 type ParagraphPreviousValues {
   id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  title: String!
   text: String!
+  status: Status!
+  level: Int!
+  createdAt: DateTime!
 }
 
 type ParagraphSubscriptionPayload {
@@ -176,8 +181,9 @@ input ParagraphSubscriptionWhereInput {
 }
 
 input ParagraphUpdateInput {
-  title: String
   text: String
+  status: Status
+  level: Int
   tags: TagUpdateManyInput
   story: ParagraphUpdateOneWithoutStoryInput
   author: UserUpdateOneWithoutParagraphsInput
@@ -202,8 +208,9 @@ input ParagraphUpdateOneWithoutStoryInput {
 }
 
 input ParagraphUpdateWithoutAuthorDataInput {
-  title: String
   text: String
+  status: Status
+  level: Int
   tags: TagUpdateManyInput
   story: ParagraphUpdateOneWithoutStoryInput
 }
@@ -214,8 +221,9 @@ input ParagraphUpdateWithoutAuthorInput {
 }
 
 input ParagraphUpdateWithoutStoryDataInput {
-  title: String
   text: String
+  status: Status
+  level: Int
   tags: TagUpdateManyInput
   author: UserUpdateOneWithoutParagraphsInput
 }
@@ -254,36 +262,6 @@ input ParagraphWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  createdAt: DateTime
-  createdAt_not: DateTime
-  createdAt_in: [DateTime!]
-  createdAt_not_in: [DateTime!]
-  createdAt_lt: DateTime
-  createdAt_lte: DateTime
-  createdAt_gt: DateTime
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  updatedAt_not: DateTime
-  updatedAt_in: [DateTime!]
-  updatedAt_not_in: [DateTime!]
-  updatedAt_lt: DateTime
-  updatedAt_lte: DateTime
-  updatedAt_gt: DateTime
-  updatedAt_gte: DateTime
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
   text: String
   text_not: String
   text_in: [String!]
@@ -298,6 +276,26 @@ input ParagraphWhereInput {
   text_not_starts_with: String
   text_ends_with: String
   text_not_ends_with: String
+  status: Status
+  status_not: Status
+  status_in: [Status!]
+  status_not_in: [Status!]
+  level: Int
+  level_not: Int
+  level_in: [Int!]
+  level_not_in: [Int!]
+  level_lt: Int
+  level_lte: Int
+  level_gt: Int
+  level_gte: Int
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
   tags_every: TagWhereInput
   tags_some: TagWhereInput
   tags_none: TagWhereInput
@@ -320,6 +318,14 @@ type Query {
   tagsConnection(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TagConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
+}
+
+enum Status {
+  TEXT
+  ORDERED
+  UNORDERED
+  CHECKED
+  UNCHECKED
 }
 
 type Subscription {

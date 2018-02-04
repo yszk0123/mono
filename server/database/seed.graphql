@@ -6,15 +6,9 @@ mutation {
       name: "Sarah"
       paragraphs: {
         create: [
-          {
-            title: "Hello World"
-            text: "This is my first blog paragraph ever!"
-          }
-          {
-            title: "My Second Paragraph"
-            text: "My first paragraph was good, but this one is better!"
-          }
-          { title: "Solving World Hunger", text: "This is a draft..." }
+          { text: "This is my first blog paragraph ever!" }
+          { text: "My first paragraph was good, but this one is better!" }
+          { text: "This is a draft...", level: 1 }
         ]
       }
     }
